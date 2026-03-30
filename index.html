@@ -3,163 +3,108 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BAH Compliance — Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="data.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:'Segoe UI','Inter',system-ui,sans-serif;
-  min-height:100vh; display:flex;
-  background:#f3f3f3;
-}
-.left-panel{
-  width:420px; flex-shrink:0;
-  background:#fff;
-  border-right:1px solid #e0e0e0;
-  display:flex; flex-direction:column;
-  padding:40px 44px;
-}
-.right-panel{
-  flex:1;
-  background:linear-gradient(160deg,#0067c0 0%,#004b8f 50%,#002d5c 100%);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:40px; position:relative; overflow:hidden;
-}
-.right-panel::before{
-  content:'';position:absolute;inset:0;
-  background-image:
-    radial-gradient(circle at 20% 80%,rgba(255,255,255,.06) 0%,transparent 50%),
-    radial-gradient(circle at 80% 20%,rgba(255,255,255,.08) 0%,transparent 50%);
-}
-.rp-content{position:relative;z-index:1;color:#fff;max-width:380px;text-align:center;}
-.rp-icon{font-size:56px;margin-bottom:20px;}
+body{font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;background:#f3f3f3;}
+.left{width:420px;flex-shrink:0;background:#fff;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;padding:40px 44px;}
+.right{flex:1;background:linear-gradient(160deg,#0067c0 0%,#004b8f 50%,#002d5c 100%);display:flex;align-items:center;justify-content:center;padding:40px;position:relative;overflow:hidden;}
+.right::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(255,255,255,.08) 0%,transparent 50%);}
+.rp{position:relative;z-index:1;color:#fff;max-width:380px;text-align:center;}
+.rp-icon{font-size:52px;margin-bottom:18px;}
 .rp-title{font-size:22px;font-weight:300;margin-bottom:8px;line-height:1.3;}
-.rp-title strong{font-weight:600;}
-.rp-sub{font-size:13px;opacity:.75;line-height:1.6;margin-bottom:32px;}
-.rp-pill{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);
-  border-radius:20px;padding:8px 16px;font-size:12px;margin-bottom:10px;
-}
+.rp-sub{font-size:13px;opacity:.75;line-height:1.6;margin-bottom:28px;}
+.rp-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:8px 16px;font-size:12px;margin-bottom:8px;}
 .rp-pills{display:flex;flex-direction:column;align-items:center;gap:6px;}
-
-/* LOGIN FORM */
-.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
-.logo-box{width:36px;height:36px;background:#0067c0;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:30px;}
+.logo-box{width:34px;height:34px;background:#0067c0;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;}
 .logo-text{font-size:13px;font-weight:600;color:#1a1a1a;line-height:1.2;}
 .logo-sub{font-size:11px;color:#888;}
-h1{font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
-.sub{font-size:13px;color:#666;margin-bottom:28px;}
+h1{font-size:20px;font-weight:600;margin-bottom:4px;}
+.sub{font-size:13px;color:#666;margin-bottom:26px;}
 .fg{margin-bottom:14px;}
 label{display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;}
-input[type=text],input[type=password]{
-  width:100%;background:#fff;border:1px solid #ccc;border-radius:4px;
-  padding:8px 10px;font-family:'Segoe UI','Inter',sans-serif;font-size:13px;
-  color:#1a1a1a;outline:none;transition:border-color .15s,box-shadow .15s;
-}
+input{width:100%;background:#fff;border:1px solid #ccc;border-radius:4px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#1a1a1a;outline:none;transition:border-color .15s,box-shadow .15s;}
 input:focus{border-color:#0067c0;box-shadow:0 0 0 2px rgba(0,103,192,.15);}
-.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
-.role-btn{
-  background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;
-  padding:10px 8px;cursor:pointer;text-align:center;
-  font-family:'Segoe UI','Inter',sans-serif;font-size:12px;color:#666;
-  transition:all .12s;
-}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
+.role-btn{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:10px 8px;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;font-size:12px;color:#666;transition:all .12s;}
 .role-btn.active{background:#dce9f9;border-color:#0067c0;color:#0067c0;font-weight:600;}
 .role-btn .ri{font-size:18px;display:block;margin-bottom:3px;}
-.btn-login{
-  width:100%;background:#0067c0;color:#fff;border:1px solid #0067c0;
-  border-radius:4px;padding:9px 14px;
-  font-family:'Segoe UI','Inter',sans-serif;font-size:13px;font-weight:600;
-  cursor:pointer;transition:background .12s;
-}
+.btn-login{width:100%;background:#0067c0;color:#fff;border:1px solid #0067c0;border-radius:4px;padding:9px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s;}
 .btn-login:hover{background:#005ba4;}
-.divider{display:flex;align-items:center;gap:10px;margin:18px 0;}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:#e0e0e0;}
 .divider span{font-size:11px;color:#aaa;}
 .demos{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.demo{
-  background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;
-  padding:8px 10px;cursor:pointer;font-family:'Segoe UI','Inter',sans-serif;
-  text-align:left;transition:border-color .12s;
-}
+.demo{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px 10px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .12s;text-align:left;}
 .demo:hover{border-color:#0067c0;}
 .demo strong{display:block;font-size:12px;color:#0067c0;}
 .demo span{font-size:11px;color:#888;}
-.err{background:#fde7e9;border:1px solid #f4aaaa;border-radius:4px;padding:8px 12px;font-size:12px;color:#c42b1c;margin-bottom:14px;display:none;}
-.footer-note{margin-top:auto;font-size:11px;color:#aaa;text-align:center;padding-top:20px;}
-@media(max-width:700px){.left-panel{width:100%}.right-panel{display:none}}
+.err{background:#fde7e9;border:1px solid #f4aaaa;border-radius:4px;padding:8px 12px;font-size:12px;color:#c42b1c;margin-bottom:12px;display:none;}
+.footer-note{margin-top:auto;font-size:11px;color:#aaa;text-align:center;padding-top:18px;}
+@media(max-width:700px){.left{width:100%}.right{display:none}}
 </style>
 </head>
 <body>
-<div class="left-panel">
+<div class="left">
   <div class="logo-row">
     <div class="logo-box">TN</div>
     <div><div class="logo-text">TechNexus Compliance</div><div class="logo-sub">BAH Instance</div></div>
   </div>
-
   <h1>Sign In</h1>
   <p class="sub">Blantyre Adventist Hospital — Compliance &amp; Quality Platform</p>
-
-  <div class="err" id="err">Incorrect credentials. Please try a demo account below.</div>
-
-  <div class="fg"><label>Username / Email</label><input type="text" id="email" value="quality@bah.mw"></div>
+  <div class="err" id="err">Incorrect credentials. Please try a demo account.</div>
+  <div class="fg"><label>Username / Email</label><input type="email" id="email" value="quality@bah.mw"></div>
   <div class="fg"><label>Password</label><input type="password" id="pass" value="password"></div>
-
-  <div style="margin-bottom:16px;">
+  <div style="margin-bottom:16px">
     <label style="margin-bottom:8px">Sign in as</label>
-    <div class="role-grid">
+    <div class="roles">
       <div class="role-btn active" data-role="quality" onclick="pick(this)"><span class="ri">🛡️</span>Quality Officer</div>
-      <div class="role-btn" data-role="staff"   onclick="pick(this)"><span class="ri">🏥</span>Clinical Staff</div>
-      <div class="role-btn" data-role="ceo"     onclick="pick(this)"><span class="ri">📊</span>CEO / Executive</div>
-      <div class="role-btn" data-role="admin"   onclick="pick(this)"><span class="ri">⚙️</span>Administrator</div>
+      <div class="role-btn"        data-role="staff"   onclick="pick(this)"><span class="ri">🏥</span>Clinical Staff</div>
+      <div class="role-btn"        data-role="ceo"     onclick="pick(this)"><span class="ri">📊</span>CEO / Executive</div>
+      <div class="role-btn"        data-role="admin"   onclick="pick(this)"><span class="ri">⚙️</span>Administrator</div>
     </div>
   </div>
-
   <button class="btn-login" onclick="login()">Sign In →</button>
-
   <div class="divider"><span>Quick demo access</span></div>
   <div class="demos">
-    <div class="demo" onclick="quick('quality@bah.mw','quality')"><strong>🛡️ Quality Officer</strong><span>Full compliance access</span></div>
-    <div class="demo" onclick="quick('nurse@bah.mw','staff')"><strong>🏥 Nurse Moyo</strong><span>Attestations & incidents</span></div>
-    <div class="demo" onclick="quick('ceo@bah.mw','ceo')"><strong>📊 CEO Kasinja</strong><span>KPIs & reports</span></div>
-    <div class="demo" onclick="quick('admin@bah.mw','admin')"><strong>⚙️ Administrator</strong><span>System settings</span></div>
+    <div class="demo" onclick="quick('quality@bah.mw','quality')"><strong>🛡️ Quality Officer</strong><span>Quality Officer Banda</span></div>
+    <div class="demo" onclick="quick('nurse@bah.mw','staff')"><strong>🏥 Clinical Staff</strong><span>Nurse Phiri</span></div>
+    <div class="demo" onclick="quick('ceo@bah.mw','ceo')"><strong>📊 CEO</strong><span>CEO Mwale</span></div>
+    <div class="demo" onclick="quick('admin@bah.mw','admin')"><strong>⚙️ Administrator</strong><span>System Administrator</span></div>
   </div>
-
   <div class="footer-note">All actions are logged with full audit trail · TechNexus v1.0</div>
 </div>
-
-<div class="right-panel">
-  <div class="rp-content">
+<div class="right">
+  <div class="rp">
     <div class="rp-icon">🏥</div>
     <div class="rp-title"><strong>Blantyre Adventist Hospital</strong><br>Compliance &amp; Quality Platform</div>
     <div class="rp-sub">Manage COHSASA accreditation, incident reporting, policy attestation, SOPs, KPIs, and corrective actions — all in one place.</div>
     <div class="rp-pills">
-      <div class="rp-pill">✔ &nbsp;COHSASA 5-Star Accreditation Ready</div>
-      <div class="rp-pill">📋 &nbsp;Policy &amp; SOP Management</div>
-      <div class="rp-pill">⚠ &nbsp;Incident &amp; Near Miss Reporting</div>
-      <div class="rp-pill">📊 &nbsp;KPI Monitoring &amp; Export</div>
+      <div class="rp-pill">✔ COHSASA 5-Star Accreditation Ready</div>
+      <div class="rp-pill">📋 Policy &amp; SOP Management</div>
+      <div class="rp-pill">⚠ Incident &amp; Near Miss Reporting</div>
+      <div class="rp-pill">📊 KPI Monitoring &amp; Export</div>
     </div>
   </div>
 </div>
-
 <script>
 initData();
-let role='quality';
-function pick(el){ role=el.dataset.role; document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-function quick(email,r){ document.getElementById('email').value=email; document.getElementById('pass').value='password'; role=r; document.querySelectorAll('.role-btn').forEach(b=>b.classList.toggle('active',b.dataset.role===r)); setTimeout(login,150); }
-function login(){
-  const e=document.getElementById('email').value.trim();
-  const p=document.getElementById('pass').value;
-  if(DEMO_USERS[e]&&p==='password'){
-    const u={...DEMO_USERS[e],role,email:e};
-    localStorage.setItem(USER_KEY,JSON.stringify(u));
-    const dest={quality:'dashboard.html',staff:'attestations.html',ceo:'kpi.html',admin:'settings.html'};
-    window.location.href=dest[role]||'dashboard.html';
-  } else { document.getElementById('err').style.display='block'; }
+var role = 'quality';
+function pick(el) { role = el.dataset.role; document.querySelectorAll('.role-btn').forEach(function(b){ b.classList.remove('active'); }); el.classList.add('active'); }
+function quick(email, r) { document.getElementById('email').value = email; document.getElementById('pass').value = 'password'; role = r; document.querySelectorAll('.role-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.role === r); }); setTimeout(login, 150); }
+function login() {
+  var e = document.getElementById('email').value.trim();
+  var p = document.getElementById('pass').value;
+  if (DEMO_USERS[e] && p === 'password') {
+    var u = Object.assign({}, DEMO_USERS[e], { role: role, email: e });
+    localStorage.setItem(USER_KEY, JSON.stringify(u));
+    var dest = { quality:'dashboard.html', staff:'attestations.html', ceo:'kpi.html', admin:'settings.html' };
+    window.location.href = dest[role] || 'dashboard.html';
+  } else { document.getElementById('err').style.display = 'block'; }
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Enter') login(); });
 </script>
 </body>
 </html>

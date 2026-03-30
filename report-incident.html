@@ -3,29 +3,25 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Report Incident — BAH Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="data.js"></script><script src="ui.js"></script>
 <style id="ws"></style>
 <style>
-.report-layout{display:grid;grid-template-columns:1fr 280px;gap:16px;}
-@media(max-width:800px){.report-layout{grid-template-columns:1fr;}}
-.sev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
-.sev-btn{border:1px solid var(--win-border2);border-radius:6px;padding:12px;cursor:pointer;background:var(--win-surface);transition:all .12s;text-align:left;}
+.rl{display:grid;grid-template-columns:1fr 260px;gap:16px;}
+@media(max-width:800px){.rl{grid-template-columns:1fr;}}
+.sev-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.sev-btn{border:1px solid var(--win-border2);border-radius:6px;padding:11px;cursor:pointer;background:var(--win-surface);transition:all .12s;text-align:left;}
 .sev-btn:hover{border-color:var(--accent);}
 .sev-btn.active{border-color:var(--accent);background:var(--accent-light);}
-.sev-btn .sev-icon{font-size:20px;margin-bottom:4px;}
-.sev-btn .sev-name{font-size:13px;font-weight:600;}
-.sev-btn .sev-sub{font-size:11px;color:var(--text-muted);}
-.anon-strip{background:#dce9f9;border:1px solid #a8caec;border-radius:6px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:12px;}
-.anon-toggle{margin-left:auto;cursor:pointer;}
-.why-report{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:14px;}
-.why-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:12px;color:var(--text-muted);}
-.this-month{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:14px;margin-top:12px;}
-.sev-mini-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.sev-dot-lg{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.sev-btn .si{font-size:18px;margin-bottom:3px;}
+.sev-btn .sn{font-size:13px;font-weight:600;}
+.sev-btn .sd{font-size:11px;color:var(--text-muted);}
+.anon-strip{background:#dce9f9;border:1px solid #a8caec;border-radius:6px;padding:11px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:12px;}
+.why-row{display:flex;gap:7px;margin-bottom:6px;font-size:12px;color:var(--text-muted);}
 </style>
 </head>
 <body>
-<script>document.getElementById('ws').textContent=WIN_CSS;</script>
+<script>document.getElementById('ws').textContent = WIN_CSS;</script>
 <div class="shell">
   <aside class="sidebar" id="sidebar"></aside>
   <div class="main">
@@ -37,56 +33,33 @@
       <div class="topbar-right"><span class="topbar-date" id="dateLabel"></span></div>
     </div>
     <div class="content">
-      <div style="background:#dff6dd;border:1px solid #c3e6c3;border-radius:6px;padding:10px 14px;font-size:12px;color:#107c10;margin-bottom:16px;">
-        All reports are handled confidentially. Anonymous submission is available.
-      </div>
-      <div class="report-layout">
+      <div style="background:#dff6dd;border:1px solid #c3e6c3;border-radius:6px;padding:9px 13px;font-size:12px;color:#107c10;margin-bottom:14px">All reports are handled confidentially. Anonymous submission is available.</div>
+      <div class="rl">
         <div>
           <div class="card">
             <div class="card-title">Incident Details</div>
-
-            <!-- Anon toggle -->
             <div class="anon-strip" id="anonStrip">
               <span>🔒 <strong>Anonymous Submission — ON</strong></span>
-              <span style="color:var(--accent)">Your identity will not be recorded. Encourages honest reporting without fear of attribution.</span>
-              <label class="anon-toggle" style="display:flex;align-items:center;gap:6px;font-size:12px">
-                <input type="checkbox" id="anonCheck" checked onchange="toggleAnon()"> Anonymous
-              </label>
+              <span style="color:var(--accent);flex:1">Your identity will not be recorded.</span>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;flex-shrink:0"><input type="checkbox" id="anonCheck" checked onchange="toggleAnon()"> Anonymous</label>
             </div>
-
-            <!-- Severity -->
             <div class="form-label" style="margin-bottom:8px">Incident Classification</div>
             <div class="sev-grid">
-              <div class="sev-btn" onclick="pickSev('No Harm',this)"><div class="sev-icon">🟢</div><div class="sev-name">No Harm</div><div class="sev-sub">Event occurred, no injury</div></div>
-              <div class="sev-btn active" onclick="pickSev('Near Miss',this)"><div class="sev-icon">🟡</div><div class="sev-name">Near Miss</div><div class="sev-sub">Caught before harm</div></div>
-              <div class="sev-btn" onclick="pickSev('Adverse Event',this)"><div class="sev-icon">🔴</div><div class="sev-name">Adverse Event</div><div class="sev-sub">Harm occurred</div></div>
-              <div class="sev-btn" onclick="pickSev('Sentinel Event',this)"><div class="sev-icon">🟣</div><div class="sev-name">Sentinel Event</div><div class="sev-sub">Serious / unexpected</div></div>
+              <div class="sev-btn" onclick="pickSev('No Harm',this)"><div class="si">🟢</div><div class="sn">No Harm</div><div class="sd">Event occurred, no injury</div></div>
+              <div class="sev-btn active" onclick="pickSev('Near Miss',this)"><div class="si">🟡</div><div class="sn">Near Miss</div><div class="sd">Caught before harm</div></div>
+              <div class="sev-btn" onclick="pickSev('Adverse Event',this)"><div class="si">🔴</div><div class="sn">Adverse Event</div><div class="sd">Harm occurred</div></div>
+              <div class="sev-btn" onclick="pickSev('Sentinel Event',this)"><div class="si">🟣</div><div class="sn">Sentinel Event</div><div class="sd">Serious / unexpected</div></div>
             </div>
-            <div id="sevHint" style="background:#fff4ce;border:1px solid #f7dba0;border-radius:5px;padding:10px 12px;font-size:12px;margin-bottom:14px;color:#9a6100">
-              <strong>Near Miss:</strong> An event that could have caused harm but was caught or did not reach the patient. Reporting near misses is critical — they reveal system weaknesses before harm occurs.
-            </div>
-
+            <div id="sevHint" style="background:#fff4ce;border:1px solid #f7dba0;border-radius:5px;padding:10px 12px;font-size:12px;margin-bottom:12px;color:#9a6100"><strong>Near Miss:</strong> An event that could have caused harm but was caught before reaching the patient. Reporting near misses reveals system weaknesses before harm occurs.</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="form-group"><label class="form-label">Date &amp; Time of Incident</label><input type="datetime-local" class="form-control" id="incDate"></div>
-              <div class="form-group"><label class="form-label">Department / Location</label>
-                <select class="form-control" id="incDept"><option>OPD</option><option>Ward 2</option><option>Ward 3</option><option>Emergency</option><option>Pharmacy</option><option>Laboratory</option><option>Theatre</option><option>Radiology</option></select>
-              </div>
+              <div class="form-group"><label class="form-label">Date &amp; Time</label><input type="datetime-local" class="form-control" id="incDate"></div>
+              <div class="form-group"><label class="form-label">Department</label><select class="form-control" id="incDept"><option>OPD</option><option>Ward 2</option><option>Ward 3</option><option>Emergency</option><option>Pharmacy</option><option>Laboratory</option><option>Theatre</option><option>Radiology</option></select></div>
             </div>
-            <div class="form-group"><label class="form-label">Incident Category</label>
-              <select class="form-control" id="incCat"><option>Medication Error</option><option>Patient Fall</option><option>Equipment Failure</option><option>Procedure Error</option><option>Documentation Error</option><option>Infection / Hygiene</option><option>Other</option></select>
-            </div>
-            <div class="form-group"><label class="form-label">Persons Involved</label>
-              <select class="form-control" id="incPersons"><option>Patient</option><option>Staff Member</option><option>Patient &amp; Staff</option><option>No person involved</option></select>
-            </div>
-            <div class="form-group"><label class="form-label">What Happened — Description <span style="color:var(--danger)">*</span></label>
-              <textarea class="form-control" id="incWhat" rows="5" placeholder="Describe what happened in detail. Be specific and factual.">During medication preparation for Ward 3, a dosage of 500mg was drawn up instead of the prescribed 250mg. The error was identified by the supervising nurse before administration. Patient was not affected. The labelling on the two similar vials was identified as the contributing factor.</textarea>
-            </div>
-            <div class="form-group"><label class="form-label">Immediate Action Taken</label>
-              <textarea class="form-control" id="incAction" rows="3" placeholder="What was done immediately after the incident?">Correct dose administered. Incident reported to ward supervisor. Vials segregated and flagged for pharmacy review.</textarea>
-            </div>
-            <div class="form-group"><label class="form-label">Contributing Factors (optional)</label>
-              <textarea class="form-control" id="incFactors" rows="2" placeholder="What factors may have contributed to this incident?">Similar vial labelling between 250mg and 500mg concentration. High workload at time of incident.</textarea>
-            </div>
+            <div class="form-group"><label class="form-label">Incident Category</label><select class="form-control" id="incCat"><option>Medication Error</option><option>Patient Fall</option><option>Equipment Failure</option><option>Procedure Error</option><option>Documentation Error</option><option>Infection / Hygiene</option><option>Other</option></select></div>
+            <div class="form-group"><label class="form-label">Persons Involved</label><select class="form-control"><option>Patient</option><option>Staff Member</option><option>Patient &amp; Staff</option><option>No person involved</option></select></div>
+            <div class="form-group"><label class="form-label">What Happened <span style="color:var(--danger)">*</span></label><textarea class="form-control" id="incWhat" rows="5" placeholder="Describe what happened in detail. Be specific and factual.">During medication preparation for Ward 3, a dosage of 500mg was drawn up instead of the prescribed 250mg. The error was identified by the supervising nurse before administration. Patient was not affected. The labelling on the two similar vials was identified as the contributing factor.</textarea></div>
+            <div class="form-group"><label class="form-label">Immediate Action Taken</label><textarea class="form-control" id="incAction" rows="3" placeholder="What was done immediately after the incident?">Correct dose administered. Incident reported to ward supervisor. Vials segregated and flagged for pharmacy review.</textarea></div>
+            <div class="form-group"><label class="form-label">Contributing Factors (optional)</label><textarea class="form-control" id="incFactors" rows="2" placeholder="What factors may have contributed?">Similar vial labelling between 250mg and 500mg concentration. High workload at time of incident.</textarea></div>
             <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
               <button class="btn btn-secondary" onclick="history.back()">Cancel</button>
               <button class="btn btn-secondary" onclick="showToast('Draft saved','warning')">Save Draft</button>
@@ -94,23 +67,22 @@
             </div>
           </div>
         </div>
-
         <div>
-          <div class="why-report">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Why Report?</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Reporting near misses and incidents is not about blame — it is about making BAH safer for patients and staff.</div>
+          <div class="card" style="margin-bottom:12px">
+            <div style="font-size:13px;font-weight:600;margin-bottom:8px">Why Report?</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Reporting is not about blame — it is about making BAH safer for patients and staff.</div>
             <div class="why-row">✅ <span>Anonymous reports are fully protected</span></div>
             <div class="why-row">✅ <span>Every report contributes to COHSASA compliance</span></div>
             <div class="why-row">✅ <span>Near misses prevent future harm</span></div>
             <div class="why-row">✅ <span>Reports drive systemic improvements</span></div>
           </div>
-          <div class="this-month">
-            <div style="font-size:13px;font-weight:600;margin-bottom:8px;">This Month</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Incidents by severity</div>
-            <div class="sev-mini-bar"><div class="sev-dot-lg" style="background:#6b7280"></div><span style="font-size:12px;flex:1">No Harm</span><strong>4</strong></div>
-            <div class="sev-mini-bar"><div class="sev-dot-lg" style="background:#f59e0b"></div><span style="font-size:12px;flex:1">Near Miss</span><strong>3</strong></div>
-            <div class="sev-mini-bar"><div class="sev-dot-lg" style="background:#ef4444"></div><span style="font-size:12px;flex:1">Adverse</span><strong>1</strong></div>
-            <div style="font-size:11px;color:var(--success);margin-top:8px;font-weight:600">↑ Reporting rate vs last month: +22%</div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:600;margin-bottom:8px">This Month</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Incidents by severity</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="width:10px;height:10px;border-radius:50%;background:#6b7280;display:inline-block"></span><span style="font-size:12px;flex:1">No Harm</span><strong>4</strong></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span><span style="font-size:12px;flex:1">Near Miss</span><strong>3</strong></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block"></span><span style="font-size:12px;flex:1">Adverse</span><strong>1</strong></div>
+            <div style="font-size:11px;color:var(--success);font-weight:600">↑ Reporting rate vs last month: +22%</div>
           </div>
         </div>
       </div>
@@ -119,58 +91,59 @@
 </div>
 <script>
 initData();
-const user=requireLogin();
-let severity='Near Miss';
-if(user){
+var user = requireLogin();
+var severity = 'Near Miss';
+if (user) {
   renderSidebar('report');
-  document.getElementById('dateLabel').textContent=topbarDate();
-  // Pre-fill date
-  const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
-  document.getElementById('incDate').value=now.toISOString().slice(0,16);
+  document.getElementById('dateLabel').textContent = topbarDate();
+  var now = new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+  document.getElementById('incDate').value = now.toISOString().slice(0,16);
 
-  function pickSev(s,el){
-    severity=s;
-    document.querySelectorAll('.sev-btn').forEach(b=>b.classList.remove('active'));
+  function pickSev(s, el) {
+    severity = s;
+    document.querySelectorAll('.sev-btn').forEach(function(b){ b.classList.remove('active'); });
     el.classList.add('active');
-    const hints={
+    var hints = {
       'No Harm':'<strong>No Harm:</strong> The event occurred but did not result in injury or harm to any patient or staff.',
-      'Near Miss':'<strong>Near Miss:</strong> An event that could have caused harm but was caught or did not reach the patient. Reporting near misses is critical — they reveal system weaknesses before harm occurs.',
-      'Adverse Event':'<strong>Adverse Event:</strong> An unintended injury or complication that resulted in harm, disability, or prolonged hospital stay.',
-      'Sentinel Event':'<strong>Sentinel Event:</strong> A serious, unexpected occurrence involving death or severe physical or psychological injury. Requires immediate CEO notification.',
+      'Near Miss':'<strong>Near Miss:</strong> An event that could have caused harm but was caught before reaching the patient.',
+      'Adverse Event':'<strong>Adverse Event:</strong> An unintended injury or complication that resulted in harm, disability, or prolonged stay.',
+      'Sentinel Event':'<strong>Sentinel Event:</strong> A serious, unexpected occurrence. Requires immediate CEO notification and full RCA.'
     };
-    document.getElementById('sevHint').innerHTML=hints[s]||'';
+    document.getElementById('sevHint').innerHTML = hints[s] || '';
   }
 
-  function toggleAnon(){
-    const on=document.getElementById('anonCheck').checked;
-    document.getElementById('anonStrip').style.background=on?'#dce9f9':'#f9f9f9';
+  function toggleAnon() {
+    var on = document.getElementById('anonCheck').checked;
+    document.getElementById('anonStrip').style.background = on ? '#dce9f9' : '#f9f9f9';
   }
 
-  function submitReport(){
-    const what=document.getElementById('incWhat').value.trim();
-    if(!what){alert('Please describe what happened.');return;}
-    const incidents=getIncidents();
-    const nextNum=Math.max(...incidents.map(i=>parseInt(i.id.replace('INC-',''))),41)+1;
-    const id='INC-00'+nextNum;
-    const anon=document.getElementById('anonCheck').checked;
-    incidents.unshift({
-      id, desc:what.slice(0,80)+(what.length>80?'…':''),
-      type:document.getElementById('incCat').value.includes('Fall')?'Incident':'Near Miss',
-      severity,
+  function submitReport() {
+    var what = document.getElementById('incWhat').value.trim();
+    if (!what) { alert('Please describe what happened.'); return; }
+    var incs   = getIncidents();
+    var maxNum = 34;
+    incs.forEach(function(i){ var n=parseInt(i.id.replace('INC-00','')); if(n>maxNum) maxNum=n; });
+    var id    = 'INC-00' + (maxNum + 1);
+    var anon  = document.getElementById('anonCheck').checked;
+    incs.unshift({
+      id:id, desc:what.slice(0,80)+(what.length>80?'…':''),
+      type:'Near Miss', severity:severity,
       dept:document.getElementById('incDept').value,
       reported:new Date().toISOString().slice(0,10),
       reporter:anon?'Anonymous':user.name,
-      investigator:'Quality Officer',
+      investigator:'Quality Officer Banda',
       status:'Investigating',
-      what, factors:document.getElementById('incFactors').value,
-      action:document.getElementById('incAction').value,
-      step:2
+      what:what, factors:document.getElementById('incFactors').value,
+      action:document.getElementById('incAction').value, step:2
     });
-    saveIncidents(incidents);
+    saveIncidents(incs);
     showToast('Incident reported — reference: '+id);
-    setTimeout(()=>location.href='incidents.html',1500);
+    setTimeout(function(){ location.href='incidents.html'; }, 1500);
   }
-  window.pickSev=pickSev; window.toggleAnon=toggleAnon; window.submitReport=submitReport;
+
+  window.pickSev      = pickSev;
+  window.toggleAnon   = toggleAnon;
+  window.submitReport = submitReport;
 }
 </script>
 </body>

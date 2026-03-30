@@ -3,25 +3,22 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KPI Dashboard — BAH Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="data.js"></script><script src="ui.js"></script>
 <style id="ws"></style>
 <style>
-.kpi-tabs{display:flex;gap:8px;margin-bottom:16px;}
-.kpi-tab{padding:6px 14px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid var(--win-border2);color:var(--text-muted);background:var(--win-surface);transition:all .12s;}
-.kpi-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.kpi-card{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:16px 18px;margin-bottom:12px;}
-.kpi-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
-.kpi-name{font-size:14px;font-weight:600;}
-.kpi-val{font-size:28px;font-weight:300;margin-bottom:2px;}
-.kpi-target{font-size:12px;color:var(--text-muted);}
-.kpi-trend{font-size:12px;font-weight:600;margin-top:4px;}
-.kpi-trend.up{color:var(--success);} .kpi-trend.down{color:var(--danger);} .kpi-trend.ok{color:var(--success);}
-.sparkline{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:8px;}
-.spark{flex:1;border-radius:2px 2px 0 0;min-height:3px;}
+.kpi-card{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.kpi-name{font-size:13px;font-weight:600;margin-bottom:3px;}
+.kpi-val{font-size:26px;font-weight:300;}
+.kpi-note{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.spark{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:8px;}
+.spark-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;background:var(--accent);opacity:.8;}
+.kpi-ptab{padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid var(--win-border2);color:var(--text-muted);background:var(--win-surface);transition:all .12s;white-space:nowrap;}
+.kpi-ptab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 </style>
 </head>
 <body>
-<script>document.getElementById('ws').textContent=WIN_CSS;</script>
+<script>document.getElementById('ws').textContent = WIN_CSS;</script>
 <div class="shell">
   <aside class="sidebar" id="sidebar"></aside>
   <div class="main">
@@ -32,32 +29,29 @@
       </div>
       <div class="topbar-right">
         <span class="topbar-date" id="dateLabel"></span>
-        <div class="kpi-tabs">
-          <div class="kpi-tab active" onclick="switchPeriod('Mar',this)">March 2026</div>
-          <div class="kpi-tab" onclick="switchPeriod('Feb',this)">February 2026</div>
-          <div class="kpi-tab" onclick="switchPeriod('Q1',this)">Q1 2026</div>
+        <div style="display:flex;gap:6px">
+          <div class="kpi-ptab active" onclick="switchPeriod(this)">March 2026</div>
+          <div class="kpi-ptab" onclick="switchPeriod(this)">February 2026</div>
+          <div class="kpi-ptab" onclick="switchPeriod(this)">Q1 2026</div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="location.href='cohsasa-export.html'">📤 COHSASA Export</button>
+        <a href="cohsasa-export.html" class="btn btn-secondary btn-sm">📤 COHSASA Export</a>
       </div>
     </div>
     <div class="content">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
         <div style="font-size:13px;font-weight:600">KPI Dashboard — <span id="periodLabel">March 2026</span></div>
-        <div style="font-size:12px;color:var(--text-muted)">Key performance indicators across quality, safety, and compliance</div>
         <span class="win-badge win-badge-green" style="margin-left:auto">COHSASA 5-Star Target: On Track</span>
       </div>
-
-      <div class="two-col" style="margin-bottom:14px;" id="kpiCards"></div>
-
+      <div class="two-col" style="margin-bottom:14px" id="kpiCards"></div>
       <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="card-title" style="margin:0">3-Month KPI Trend</div>
-          <button class="btn btn-secondary btn-sm" onclick="location.href='cohsasa-export.html'">📤 Export for COHSASA</button>
+          <a href="cohsasa-export.html" class="btn btn-secondary btn-sm">📤 Export for COHSASA</a>
         </div>
         <div class="win-table-wrap" style="border:none">
           <table class="win-table">
             <thead><tr><th>KPI</th><th>Target</th><th>January</th><th>February</th><th>March</th><th>Trend</th></tr></thead>
-            <tbody id="trendTable"></tbody>
+            <tbody id="trendBody"></tbody>
           </table>
         </div>
       </div>
@@ -66,52 +60,64 @@
 </div>
 <script>
 initData();
-const user=requireLogin();
-if(user){
+var user = requireLogin();
+if (user) {
   renderSidebar('kpi');
-  document.getElementById('dateLabel').textContent=topbarDate();
+  document.getElementById('dateLabel').textContent = topbarDate();
 
-  const KPIS=[
-    {name:'Policy Attestation Rate',  val:'94%', target:'≥ 95%', trend:'up',   note:'▲ +6% vs Feb — just below target',   vals:[81,88,94], col:'#c75700', ok:false, spark:[40,60,70,75,80,85,94]},
-    {name:'Incident Reporting Rate',  val:'8',   target:'≥ 5/month',trend:'up', note:'▲ +22% vs Feb — reporting culture improving', vals:[5,7,8],  col:'#0067c0', ok:true, spark:[3,4,5,5,6,7,8]},
-    {name:'SOP Currency Rate',        val:'76%', target:'≥ 95%', trend:'down', note:'▼ 3 SOPs overdue for review',          vals:[91,85,76], col:'#c42b1c', ok:false, spark:[91,90,88,85,82,79,76]},
-    {name:'Corrective Action Closure',val:'67%', target:'≥ 80%', trend:'down', note:'4 actions overdue — action required',  vals:[90,75,67], col:'#c42b1c', ok:false, spark:[90,85,80,78,75,70,67]},
-    {name:'Near Miss Reporting Rate', val:'38%', target:'≥ 30%', trend:'ok',   note:'✓ Target met — good safety culture',  vals:[25,33,38], col:'#107c10', ok:true, spark:[20,25,28,30,32,35,38]},
-    {name:'Adverse Event Rate',       val:'0.013%',target:'≤ 0.05%',trend:'ok',note:'✓ Well within target range',          vals:[0.018,0.011,0.013],col:'#107c10', ok:true, spark:[3,2,2,2,1,1,1]},
+  var KPIS = [
+    { name:'Policy Attestation Rate',   val:'94%',    target:'≥ 95%',      ok:false, note:'▲ +6% vs Feb — just below target',          spark:[40,60,70,75,80,85,94], col:'#c75700' },
+    { name:'Incident Reporting Rate',   val:'8',      target:'≥ 5/month',  ok:true,  note:'▲ +22% vs Feb — reporting culture improving', spark:[3,4,5,5,6,7,8],       col:'#0067c0' },
+    { name:'SOP Currency Rate',         val:'76%',    target:'≥ 95%',      ok:false, note:'▼ 3 SOPs overdue for review',                 spark:[91,90,88,85,82,79,76], col:'#c42b1c' },
+    { name:'Corrective Action Closure', val:'67%',    target:'≥ 80%',      ok:false, note:'4 actions overdue — action required',         spark:[90,85,80,78,75,70,67], col:'#c42b1c' },
+    { name:'Near Miss Reporting Rate',  val:'38%',    target:'≥ 30%',      ok:true,  note:'✓ Target met — good safety culture',          spark:[20,25,28,30,32,35,38], col:'#107c10' },
+    { name:'Adverse Event Rate',        val:'0.013%', target:'≤ 0.05%',    ok:true,  note:'✓ Well within target range',                  spark:[3,2,2,2,1,1,1],        col:'#107c10' },
   ];
 
-  document.getElementById('kpiCards').innerHTML=KPIS.map(k=>`
-    <div class="kpi-card">
-      <div class="kpi-header">
-        <div>
-          <div class="kpi-name">${k.name}</div>
-          <div class="kpi-target">Target: <strong>${k.target}</strong></div>
-        </div>
-        <span class="win-badge ${k.ok?'win-badge-green':'win-badge-red'}">${k.ok?'On Track':'Attention'}</span>
-      </div>
-      <div class="kpi-val" style="color:${k.col}">${k.val}</div>
-      <div class="kpi-trend ${k.trend}">${k.note}</div>
-      <div class="sparkline">${k.spark.map(v=>`<div class="spark" style="height:${Math.round(v/Math.max(...k.spark)*100)}%;background:${k.col};opacity:.7"></div>`).join('')}</div>
-    </div>`).join('');
+  var kpiHtml = '';
+  KPIS.forEach(function(k) {
+    var maxS = Math.max.apply(null, k.spark);
+    var sparkHtml = k.spark.map(function(v){ return '<div class="spark-bar" style="height:'+Math.round(v/maxS*100)+'%;background:'+k.col+'"></div>'; }).join('');
+    kpiHtml += '<div class="kpi-card">'
+      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">'
+      + '<div class="kpi-name">'+k.name+'</div>'
+      + '<span class="win-badge '+(k.ok?'win-badge-green':'win-badge-red')+'">'+(k.ok?'On Track':'Attention')+'</span>'
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Target: <strong>'+k.target+'</strong></div>'
+      + '<div class="kpi-val" style="color:'+k.col+'">'+k.val+'</div>'
+      + '<div class="kpi-note">'+k.note+'</div>'
+      + '<div class="spark">'+sparkHtml+'</div>'
+      + '</div>';
+  });
+  document.getElementById('kpiCards').innerHTML = kpiHtml;
 
-  const trendRows=[
-    {kpi:'Policy Attestation Rate', target:'≥ 95%', jan:'81%', feb:'88%', mar:'94%', trend:'▲ Improving'},
-    {kpi:'Incident Reports Filed',  target:'≥ 5',   jan:'5',   feb:'7',   mar:'8',   trend:'▲ Improving'},
-    {kpi:'SOP Currency Rate',       target:'≥ 95%', jan:'91%', feb:'85%', mar:'76%', trend:'▼ Declining'},
-    {kpi:'Corrective Action Closure',target:'≥ 80%',jan:'90%', feb:'75%', mar:'67%', trend:'▼ Needs attention'},
-    {kpi:'Adverse Event Rate',      target:'≤ 0.05%',jan:'0.018%',feb:'0.011%',mar:'0.013%',trend:'✓ Stable'},
+  var trendRows = [
+    { kpi:'Policy Attestation Rate',   target:'≥ 95%',     jan:'81%',    feb:'88%',    mar:'94%',    trend:'▲ Improving',      up:true  },
+    { kpi:'Incident Reports Filed',    target:'≥ 5',       jan:'5',      feb:'7',      mar:'8',      trend:'▲ Improving',      up:true  },
+    { kpi:'SOP Currency Rate',         target:'≥ 95%',     jan:'91%',    feb:'85%',    mar:'76%',    trend:'▼ Declining',      up:false },
+    { kpi:'Corrective Action Closure', target:'≥ 80%',     jan:'90%',    feb:'75%',    mar:'67%',    trend:'▼ Needs attention', up:false },
+    { kpi:'Adverse Event Rate',        target:'≤ 0.05%',   jan:'0.018%', feb:'0.011%', mar:'0.013%', trend:'✓ Stable',         up:true  },
   ];
-  document.getElementById('trendTable').innerHTML=trendRows.map(r=>`<tr>
-    <td style="font-weight:500">${r.kpi}</td>
-    <td style="font-size:12px;color:var(--text-muted)">${r.target}</td>
-    <td style="font-size:13px">${r.jan}</td>
-    <td style="font-size:13px">${r.feb}</td>
-    <td style="font-size:13px;font-weight:600">${r.mar}</td>
-    <td style="font-size:12px;color:${r.trend.startsWith('▲')||r.trend.startsWith('✓')?'var(--success)':'var(--danger)'}">${r.trend}</td>
-  </tr>`).join('');
+  var tHtml = '';
+  trendRows.forEach(function(r) {
+    tHtml += '<tr>'
+      + '<td style="font-weight:500">'+r.kpi+'</td>'
+      + '<td style="font-size:12px;color:var(--text-muted)">'+r.target+'</td>'
+      + '<td style="font-size:13px">'+r.jan+'</td>'
+      + '<td style="font-size:13px">'+r.feb+'</td>'
+      + '<td style="font-size:13px;font-weight:600">'+r.mar+'</td>'
+      + '<td style="font-size:12px;color:'+(r.up?'var(--success)':'var(--danger)')+'">'+r.trend+'</td>'
+      + '</tr>';
+  });
+  document.getElementById('trendBody').innerHTML = tHtml;
 
-  function switchPeriod(p,el){document.querySelectorAll('.kpi-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');showToast(`Showing ${el.textContent} data`);}
-  window.switchPeriod=switchPeriod;
+  function switchPeriod(el) {
+    document.querySelectorAll('.kpi-ptab').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('periodLabel').textContent = el.textContent;
+    showToast('Showing ' + el.textContent + ' data');
+  }
+  window.switchPeriod = switchPeriod;
 }
 </script>
 </body>

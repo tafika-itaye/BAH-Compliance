@@ -3,23 +3,18 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Attestations — BAH Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="data.js"></script><script src="ui.js"></script>
 <style id="ws"></style>
 <style>
-.attest-card{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
-.attest-card.urgent{border-left:3px solid var(--danger);}
-.attest-card.pending{border-left:3px solid var(--warning);}
-.attest-card.ok{border-left:3px solid var(--success);}
-.attest-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
-.attest-title{font-size:14px;font-weight:600;}
-.attest-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
-.attest-due{font-size:12px;font-weight:600;margin-bottom:6px;}
-.attest-due.urgent{color:var(--danger);}
-.attest-due.pending{color:var(--warning);}
+.att-card{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.att-card.urgent{border-left:3px solid var(--danger);}
+.att-card.pending{border-left:3px solid var(--warning);}
+.att-card.ok{border-left:3px solid var(--success);}
 </style>
 </head>
 <body>
-<script>document.getElementById('ws').textContent=WIN_CSS;</script>
+<script>document.getElementById('ws').textContent = WIN_CSS;</script>
 <div class="shell">
   <aside class="sidebar" id="sidebar"></aside>
   <div class="main">
@@ -31,114 +26,124 @@
       <div class="topbar-right"><span class="topbar-date" id="dateLabel"></span></div>
     </div>
     <div class="content">
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Policies and SOPs requiring your acknowledgement — <span id="userName"></span></div>
-
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Policies and SOPs requiring your acknowledgement — <span id="userName"></span></div>
       <div class="stats-grid" id="attStats"></div>
 
-      <!-- Pending -->
-      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Pending Attestations <span id="pendCount" style="color:var(--text-muted);font-weight:400"></span></div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">Pending Attestations <span id="pendCount" style="font-weight:400;color:var(--text-muted)"></span></div>
       <div id="pendingList"></div>
 
-      <div style="font-size:13px;font-weight:600;margin-top:20px;margin-bottom:10px;">Completed Attestations</div>
+      <div style="font-size:13px;font-weight:600;margin-top:20px;margin-bottom:10px">Completed Attestations</div>
       <div class="win-table-wrap">
         <table class="win-table">
           <thead><tr><th>Policy / SOP</th><th>Version</th><th>Acknowledged</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>Patient Privacy Policy</td><td>v3.0</td><td>05 Mar 2026</td><td>${statusBadge('Published')}</td></tr>
-            <tr><td>Fire Safety &amp; Evacuation Policy</td><td>v5.0</td><td>20 Jan 2026</td><td>${statusBadge('Published')}</td></tr>
-            <tr><td>IV Line Insertion Procedure</td><td>v3.1</td><td>10 Mar 2026</td><td>${statusBadge('Published')}</td></tr>
-            <tr><td>Hand Hygiene Protocol</td><td>v2.0</td><td>15 Feb 2026</td><td>${statusBadge('Published')}</td></tr>
-          </tbody>
+          <tbody id="completedBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Attestation Modal -->
 <div class="modal-overlay" id="attModal" style="display:none">
-  <div class="win-modal" style="max-width:600px">
-    <div class="win-modal-header"><div class="win-modal-title" id="attModalTitle">Read & Acknowledge</div><button class="win-modal-close" onclick="closeAttModal()">✕</button></div>
+  <div class="win-modal" style="max-width:580px">
+    <div class="win-modal-header"><div class="win-modal-title" id="attModalTitle">Read &amp; Acknowledge</div><button class="win-modal-close" onclick="closeAtt()">✕</button></div>
     <div class="win-modal-body">
-      <div style="background:var(--win-surface2);border:1px solid var(--win-border);border-radius:6px;padding:16px;font-size:13px;line-height:1.7;max-height:300px;overflow-y:auto;margin-bottom:14px" id="attModalContent">Loading…</div>
-      <div style="background:#dff6dd;border:1px solid #c3e6c3;border-radius:6px;padding:12px 14px;font-size:12px;color:#107c10;margin-bottom:14px">
-        <strong>Declaration:</strong> By clicking "Acknowledge", I confirm that I have read, understood, and agree to comply with this policy/SOP.
+      <div style="background:var(--win-surface2);border:1px solid var(--win-border);border-radius:6px;padding:14px;font-size:13px;line-height:1.7;max-height:280px;overflow-y:auto;margin-bottom:12px" id="attContent">Loading…</div>
+      <div style="background:#dff6dd;border:1px solid #c3e6c3;border-radius:6px;padding:10px 12px;font-size:12px;color:#107c10;margin-bottom:12px">
+        <strong>Declaration:</strong> By clicking "Acknowledge", I confirm that I have read, understood, and agree to comply with this policy / SOP.
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
         <input type="checkbox" id="attCheck"> I have read and understood this document
       </label>
     </div>
     <div class="win-modal-footer">
-      <button class="btn btn-secondary" onclick="closeAttModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="acknowledge()" id="attConfirmBtn">Acknowledge</button>
+      <button class="btn btn-secondary" onclick="closeAtt()">Cancel</button>
+      <button class="btn btn-primary" onclick="acknowledge()">Acknowledge</button>
     </div>
   </div>
 </div>
 
 <script>
 initData();
-const user=requireLogin();
-let currentAttId=null;
-if(user){
+var user = requireLogin();
+var currentAttId = null;
+
+if (user) {
   renderSidebar('attestations');
-  document.getElementById('dateLabel').textContent=topbarDate();
-  document.getElementById('userName').textContent=user.name;
+  document.getElementById('dateLabel').textContent = topbarDate();
+  document.getElementById('userName').textContent  = user.name;
 
-  const pending=getPending();
-  const policies=getPolicies();
+  var pending  = getPending();
+  var policies = getPolicies();
 
-  document.getElementById('attStats').innerHTML=[
-    {icon:'⏳',label:'Pending',     value:pending.length, sub:'1 overdue',      cls:pending.length>0?'stat-warn':'stat-ok'},
-    {icon:'✔', label:'Completed',   value:14,             sub:'This year',       cls:'stat-ok'},
-    {icon:'📋',label:'Compliance',  value:'82%',          sub:'Personal rate',   cls:'stat-warn'},
-  ].map(s=>`<div class="stat-card"><div style="font-size:20px;margin-bottom:4px">${s.icon}</div><div class="stat-label">${s.label}</div><div class="stat-value ${s.cls}">${s.value}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
+  document.getElementById('attStats').innerHTML = [
+    { icon:'⏳', label:'Pending',    value:pending.length, sub:'1 overdue',    cls:pending.length>0?'stat-warn':'' },
+    { icon:'✔',  label:'Completed',  value:14,             sub:'This year',    cls:'stat-ok' },
+    { icon:'📋', label:'Compliance', value:'82%',           sub:'Personal rate',cls:'stat-warn' },
+  ].map(function(s){
+    return '<div class="stat-card"><div style="font-size:20px;margin-bottom:4px">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-value '+s.cls+'">'+s.value+'</div><div class="stat-sub">'+s.sub+'</div></div>';
+  }).join('');
 
-  document.getElementById('pendCount').textContent=`(${pending.length} awaiting)`;
+  document.getElementById('pendCount').textContent = '(' + pending.length + ' awaiting)';
 
-  const pendingPolicies=[
-    {id:'POL-001',title:'Infection Control Policy — v4.2',    sub:'Updated 3 days ago · Mandatory for all clinical staff',due:'20 Mar 2026',days:2, cls:'urgent'},
-    {id:'POL-003',title:'Medication Administration SOP — v2.1',sub:'Updated 5 days ago · Nursing staff',                  due:'24 Mar 2026',days:6, cls:'pending'},
-    {id:'SOP-007',title:'Sharps Disposal Procedure — v3.0',    sub:'Updated 1 week ago · All clinical staff',             due:'28 Mar 2026',days:10,cls:''},
-  ].filter(p=>pending.includes(p.id));
+  var pendItems = [
+    { id:'POL-001', title:'Infection Control Policy — v4.2',      sub:'Updated 3 days ago · Mandatory for all clinical staff', due:'20 Mar 2026', days:2,  cls:'urgent' },
+    { id:'POL-003', title:'Medication Administration SOP — v2.1', sub:'Updated 5 days ago · Nursing staff',                   due:'24 Mar 2026', days:6,  cls:'pending' },
+    { id:'SOP-003', title:'Sharps Disposal Procedure — v3.0',     sub:'Updated 1 week ago · All clinical staff',              due:'28 Mar 2026', days:10, cls:'' },
+  ].filter(function(p){ return pending.indexOf(p.id) !== -1; });
 
-  if(!pendingPolicies.length){
-    document.getElementById('pendingList').innerHTML=`<div class="attest-card ok"><div style="color:var(--success);font-weight:600">✔ All up to date!</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">You have no pending attestations at this time.</div></div>`;
+  if (!pendItems.length) {
+    document.getElementById('pendingList').innerHTML = '<div class="att-card ok"><div style="color:var(--success);font-weight:600">✔ All up to date!</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">You have no pending attestations at this time.</div></div>';
   } else {
-    document.getElementById('pendingList').innerHTML=pendingPolicies.map(p=>`
-      <div class="attest-card ${p.cls}">
-        <div class="attest-top">
-          <div>
-            <div class="attest-title">⏳ ${p.title}</div>
-            <div class="attest-sub">${p.sub}</div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="openAttest('${p.id}','${p.title}')">Read &amp; Acknowledge</button>
-        </div>
-        <div class="attest-due ${p.cls}">⚠ Due: ${p.due} ${p.days<=3?`(${p.days} days remaining)`:''}</div>
-      </div>`).join('');
+    var pendHtml = '';
+    pendItems.forEach(function(p) {
+      pendHtml += '<div class="att-card ' + p.cls + '">'
+        + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px">'
+        + '<div><div style="font-size:13px;font-weight:600">⏳ '+p.title+'</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+p.sub+'</div></div>'
+        + '<button class="btn btn-primary btn-sm" onclick="openAtt(\''+p.id+'\',\''+p.title+'\')">Read &amp; Acknowledge</button>'
+        + '</div>'
+        + '<div style="font-size:12px;font-weight:600;color:'+(p.cls==='urgent'?'var(--danger)':p.cls==='pending'?'var(--warning)':'var(--text-muted)')+'">⚠ Due: '+p.due+(p.days<=3?' ('+p.days+' days remaining)':'')+'</div>'
+        + '</div>';
+    });
+    document.getElementById('pendingList').innerHTML = pendHtml;
   }
 
-  function openAttest(id, title){
-    currentAttId=id;
-    document.getElementById('attModalTitle').textContent=title;
-    const pol=getPolicies().find(p=>p.id===id);
-    document.getElementById('attModalContent').textContent=pol?pol.content:'[SOP content would be displayed here]';
-    document.getElementById('attCheck').checked=false;
-    document.getElementById('attModal').style.display='flex';
+  // Completed table — using string concatenation, not template literals
+  var completed = [
+    { title:'Patient Privacy Policy',           version:'v3.0', date:'05 Mar 2026' },
+    { title:'Fire Safety & Evacuation Policy',  version:'v5.0', date:'20 Jan 2026' },
+    { title:'IV Line Insertion Procedure',      version:'v3.1', date:'10 Mar 2026' },
+    { title:'Hand Hygiene Protocol',            version:'v2.0', date:'15 Feb 2026' },
+  ];
+  var compHtml = '';
+  completed.forEach(function(c) {
+    compHtml += '<tr><td>'+c.title+'</td><td style="font-size:12px">'+c.version+'</td><td style="font-size:12px">'+c.date+'</td><td>'+statusBadge('Published')+'</td></tr>';
+  });
+  document.getElementById('completedBody').innerHTML = compHtml;
+
+  function openAtt(id, title) {
+    currentAttId = id;
+    document.getElementById('attModalTitle').textContent = title;
+    var pol = getPolicies().find(function(p){ return p.id === id; });
+    document.getElementById('attContent').textContent = pol ? pol.content : '[SOP content would be displayed here from the document management system.]';
+    document.getElementById('attCheck').checked = false;
+    document.getElementById('attModal').style.display = 'flex';
   }
 
-  function closeAttModal(){ document.getElementById('attModal').style.display='none'; currentAttId=null; }
+  function closeAtt() { document.getElementById('attModal').style.display = 'none'; currentAttId = null; }
 
-  function acknowledge(){
-    if(!document.getElementById('attCheck').checked){alert('Please confirm you have read the document.');return;}
-    if(!currentAttId) return;
-    const p=getPending().filter(id=>id!==currentAttId);
+  function acknowledge() {
+    if (!document.getElementById('attCheck').checked) { alert('Please confirm you have read the document.'); return; }
+    if (!currentAttId) return;
+    var p = getPending().filter(function(id){ return id !== currentAttId; });
     savePending(p);
-    closeAttModal();
+    closeAtt();
     showToast('Attestation recorded — thank you!');
-    setTimeout(()=>location.reload(),1200);
+    setTimeout(function(){ location.reload(); }, 1200);
   }
 
-  window.openAttest=openAttest; window.closeAttModal=closeAttModal; window.acknowledge=acknowledge;
+  window.openAtt    = openAtt;
+  window.closeAtt   = closeAtt;
+  window.acknowledge= acknowledge;
 }
 </script>
 </body>

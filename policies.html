@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Policy Management — BAH Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="data.js"></script><script src="ui.js"></script>
 <style id="ws"></style>
 <style>
-.pol-tabs{display:flex;gap:0;border-bottom:1px solid var(--win-border);margin-bottom:16px;}
-.pol-tab{padding:8px 16px;font-size:13px;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap;}
+.pol-tabs{display:flex;gap:0;border-bottom:1px solid var(--win-border);margin-bottom:14px;}
+.pol-tab{padding:8px 14px;font-size:13px;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap;}
 .pol-tab:hover{color:var(--text);}
 .pol-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
-.approval-strip{background:#fff4ce;border:1px solid #f7dba0;border-radius:6px;padding:14px 16px;margin-bottom:16px;}
-.approval-strip-title{font-size:13px;font-weight:600;margin-bottom:10px;}
-.wf-compact{display:flex;gap:0;align-items:center;margin-bottom:12px;}
-.wf-step-c{display:flex;align-items:center;gap:6px;font-size:12px;}
-.wf-step-c .wc{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid #ccc;background:#fff;color:#999;flex-shrink:0;}
-.wf-step-c.done .wc{background:#0067c0;border-color:#0067c0;color:#fff;}
-.wf-step-c.active .wc{border-color:#0067c0;color:#0067c0;}
-.wf-line{flex:1;height:1px;background:#ddd;margin:0 6px;min-width:20px;}
+.appr-strip{background:#fff4ce;border:1px solid #f7dba0;border-radius:6px;padding:12px 14px;margin-bottom:14px;}
+.wf-wrap{display:flex;align-items:center;gap:0;margin-bottom:10px;overflow-x:auto;}
+.wf-step{display:flex;align-items:center;gap:6px;font-size:12px;flex-shrink:0;}
+.wf-circle{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid #ccc;background:#fff;color:#999;flex-shrink:0;}
+.wf-step.done .wf-circle{background:#0067c0;border-color:#0067c0;color:#fff;}
+.wf-step.active .wf-circle{border-color:#0067c0;color:#0067c0;}
+.wf-line{width:24px;height:1px;background:#ddd;flex-shrink:0;}
 .wf-line.done{background:#0067c0;}
 </style>
 </head>
 <body>
-<script>document.getElementById('ws').textContent=WIN_CSS;</script>
+<script>document.getElementById('ws').textContent = WIN_CSS;</script>
 <div class="shell">
   <aside class="sidebar" id="sidebar"></aside>
   <div class="main">
@@ -33,29 +33,28 @@
       </div>
       <div class="topbar-right">
         <span class="topbar-date" id="dateLabel"></span>
-        <button class="btn btn-primary btn-sm" onclick="openNewModal()">＋ New Policy</button>
+        <button class="btn btn-primary btn-sm" onclick="openNew()">＋ New Policy</button>
       </div>
     </div>
     <div class="content">
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Centralised policy repository with version control, approval workflows, and staff attestation</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Centralised policy repository with version control, approval workflows, and staff attestation</div>
 
-      <!-- Approval strip -->
-      <div class="approval-strip" id="approvalStrip" style="display:none">
-        <div class="approval-strip-title">Infection Control Policy v4.2 — Approval In Progress</div>
-        <div class="wf-compact" id="wfBar"></div>
+      <div class="appr-strip" id="apprStrip" style="display:none">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Infection Control Policy v4.2 — Approval In Progress</div>
+        <div class="wf-wrap" id="wfBar"></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="approve()">Approve &amp; Publish</button>
+          <button class="btn btn-primary btn-sm" onclick="approvePolicy('POL-001')">Approve &amp; Publish</button>
           <button class="btn btn-secondary btn-sm" onclick="showToast('Revision requested — returned to Quality Officer','warning')">Request Revision</button>
-          <button class="btn btn-secondary btn-sm" onclick="location.href='policy-detail.html?id=POL-001'">View Document</button>
+          <a href="policy-detail.html?id=POL-001" class="btn btn-secondary btn-sm">View Document</a>
         </div>
       </div>
 
       <div class="pol-tabs">
-        <div class="pol-tab active" onclick="filterTab('',this)">All (<span id="cntAll">—</span>)</div>
-        <div class="pol-tab" onclick="filterTab('Published',this)">Published (<span id="cntPub">—</span>)</div>
-        <div class="pol-tab" onclick="filterTab('Pending Approval',this)">Pending Approval (<span id="cntPend">—</span>)</div>
-        <div class="pol-tab" onclick="filterTab('Under Review',this)">Under Review (<span id="cntRev">—</span>)</div>
-        <div class="pol-tab" onclick="filterTab('Expired',this)">Expired (<span id="cntExp">—</span>)</div>
+        <div class="pol-tab active" onclick="filterTab('',this)">All (<span id="cAll">0</span>)</div>
+        <div class="pol-tab" onclick="filterTab('Published',this)">Published (<span id="cPub">0</span>)</div>
+        <div class="pol-tab" onclick="filterTab('Pending Approval',this)">Pending Approval (<span id="cPend">0</span>)</div>
+        <div class="pol-tab" onclick="filterTab('Under Review',this)">Under Review (<span id="cRev">0</span>)</div>
+        <div class="pol-tab" onclick="filterTab('Expired',this)">Expired (<span id="cExp">0</span>)</div>
       </div>
 
       <div class="filter-row">
@@ -79,21 +78,20 @@
   </div>
 </div>
 
-<!-- New Policy Modal -->
 <div class="modal-overlay" id="newModal" style="display:none">
   <div class="win-modal">
-    <div class="win-modal-header"><div class="win-modal-title">New Policy</div><button class="win-modal-close" onclick="closeModal()">✕</button></div>
+    <div class="win-modal-header"><div class="win-modal-title">New Policy</div><button class="win-modal-close" onclick="closeNew()">✕</button></div>
     <div class="win-modal-body">
       <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-control" id="nTitle" placeholder="Policy name"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="form-group"><label class="form-label">Category</label><select class="form-control" id="nCat"><option value="Clinical">Clinical</option><option value="Governance">Governance</option><option value="Safety">Safety</option><option value="HR">HR</option></select></div>
         <div class="form-group"><label class="form-label">Review Cycle</label><select class="form-control" id="nCycle"><option>Annual</option><option>Bi-annual</option><option>3 Years</option></select></div>
       </div>
-      <div class="form-group"><label class="form-label">COHSASA Reference</label><input type="text" class="form-control" id="nCohsasa" placeholder="e.g. IPC-003"></div>
-      <div class="form-group"><label class="form-label">Content / Body</label><textarea class="form-control" id="nContent" rows="5" placeholder="Enter policy content…"></textarea></div>
+      <div class="form-group"><label class="form-label">COHSASA Reference</label><input type="text" class="form-control" id="nRef" placeholder="e.g. IPC-003"></div>
+      <div class="form-group"><label class="form-label">Content</label><textarea class="form-control" id="nContent" rows="4" placeholder="Enter policy content…"></textarea></div>
     </div>
     <div class="win-modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-secondary" onclick="closeNew()">Cancel</button>
       <button class="btn btn-primary" onclick="createPolicy()">Create Policy</button>
     </div>
   </div>
@@ -101,80 +99,120 @@
 
 <script>
 initData();
-const user=requireLogin();
-let tabFilter='';
-if(user){
+var user = requireLogin();
+var tabFilter = '';
+
+if (user) {
   renderSidebar('policies');
-  document.getElementById('dateLabel').textContent=topbarDate();
+  document.getElementById('dateLabel').textContent = topbarDate();
 
-  // Show approval strip for quality/admin
-  if(user.role==='quality'||user.role==='admin'){
-    document.getElementById('approvalStrip').style.display='block';
-    const steps=[{label:'Drafted\nQ. Officer',done:true},{label:'Reviewed\nDept Head',done:true},{label:'Approved\nCEO',done:false,active:true},{label:'Published\nAll Staff',done:false},{label:'Attested\nComplete',done:false}];
-    document.getElementById('wfBar').innerHTML=steps.map((s,i)=>`
-      <div class="wf-step-c ${s.done?'done':''} ${s.active?'active':''}">
-        ${i>0?`<div class="wf-line ${steps[i-1].done?'done':''}"></div>`:''}
-        <div class="wc">${s.done?'✔':i+1}</div>
-        <span style="color:${s.done?'var(--accent)':s.active?'var(--text)':'var(--text-muted)'}">${s.label.split('\n')[0]}<br><span style="font-size:10px;color:var(--text-muted)">${s.label.split('\n')[1]}</span></span>
-      </div>`).join('');
+  if (user.role === 'quality' || user.role === 'admin') {
+    var pols = getPolicies();
+    if (pols.find(function(p){ return p.status === 'Pending Approval'; })) {
+      document.getElementById('apprStrip').style.display = 'block';
+      var steps = [
+        { label:'Drafted',  sub:'Q. Officer', done:true  },
+        { label:'Reviewed', sub:'Dept Head',  done:true  },
+        { label:'Approved', sub:'CEO',        done:false, active:true },
+        { label:'Published',sub:'All Staff',  done:false },
+        { label:'Attested', sub:'Complete',   done:false },
+      ];
+      var wfHtml = '';
+      steps.forEach(function(s, i) {
+        if (i > 0) wfHtml += '<div class="wf-line' + (steps[i-1].done ? ' done' : '') + '"></div>';
+        wfHtml += '<div class="wf-step' + (s.done?' done':'') + (s.active?' active':'') + '">'
+          + '<div class="wf-circle">' + (s.done ? '✔' : (i+1)) + '</div>'
+          + '<div><div style="color:' + (s.done?'#0067c0':s.active?'#1a1a1a':'#999') + ';font-size:11px;font-weight:600">' + s.label + '</div>'
+          + '<div style="color:#999;font-size:10px">' + s.sub + '</div></div>'
+          + '</div>';
+      });
+      document.getElementById('wfBar').innerHTML = wfHtml;
+    }
   }
 
-  function render(){
-    const q=document.getElementById('search').value.toLowerCase();
-    const cf=document.getElementById('catFilter').value;
-    let pols=getPolicies();
-    document.getElementById('cntAll').textContent=pols.length;
-    document.getElementById('cntPub').textContent=pols.filter(p=>p.status==='Published').length;
-    document.getElementById('cntPend').textContent=pols.filter(p=>p.status==='Pending Approval').length;
-    document.getElementById('cntRev').textContent=pols.filter(p=>p.status==='Under Review').length;
-    document.getElementById('cntExp').textContent=pols.filter(p=>p.status==='Expired').length;
-    if(tabFilter) pols=pols.filter(p=>p.status===tabFilter);
-    if(q) pols=pols.filter(p=>p.title.toLowerCase().includes(q)||p.category.toLowerCase().includes(q));
-    if(cf) pols=pols.filter(p=>p.category===cf);
-    const attPct=p=>p.total>0?Math.round(p.attested/p.total*100):0;
-    document.getElementById('polBody').innerHTML=pols.map(p=>`<tr>
-      <td><a href="policy-detail.html?id=${p.id}" style="font-weight:600">${p.title}</a></td>
-      <td style="font-size:12px">${p.category}</td>
-      <td style="font-size:12px;font-weight:600">${p.version}</td>
-      <td style="font-size:12px;color:var(--text-muted)">${p.updated}</td>
-      <td>
-        <div style="font-size:12px;margin-bottom:3px">${p.total>0?`${p.attested}/${p.total}`:'N/A'}</div>
-        ${p.total>0?`<div style="width:80px">${progressBar(attPct(p),attPct(p)>=80?'var(--success)':attPct(p)>=50?'var(--warning)':'var(--danger)')}</div>`:''}
-      </td>
-      <td style="font-size:12px;color:${p.status==='Expired'?'var(--danger)':'var(--text-muted)'">${p.reviewDue}${p.status==='Expired'?' ⚠':''}</td>
-      <td>${statusBadge(p.status)}</td>
-      <td><a href="policy-detail.html?id=${p.id}" class="btn btn-secondary btn-sm">${p.status==='Expired'?'Renew':'View'}</a></td>
-    </tr>`).join('');
+  function render() {
+    var q   = document.getElementById('search').value.toLowerCase();
+    var cf  = document.getElementById('catFilter').value;
+    var all = getPolicies();
+
+    document.getElementById('cAll').textContent  = all.length;
+    document.getElementById('cPub').textContent  = all.filter(function(p){ return p.status==='Published'; }).length;
+    document.getElementById('cPend').textContent = all.filter(function(p){ return p.status==='Pending Approval'; }).length;
+    document.getElementById('cRev').textContent  = all.filter(function(p){ return p.status==='Under Review'; }).length;
+    document.getElementById('cExp').textContent  = all.filter(function(p){ return p.status==='Expired'; }).length;
+
+    var list = all;
+    if (tabFilter) list = list.filter(function(p){ return p.status === tabFilter; });
+    if (q)         list = list.filter(function(p){ return p.title.toLowerCase().indexOf(q) !== -1 || p.category.toLowerCase().indexOf(q) !== -1; });
+    if (cf)        list = list.filter(function(p){ return p.category === cf; });
+
+    if (!list.length) {
+      document.getElementById('polBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📋</div>No policies match your filters.</div></td></tr>';
+      return;
+    }
+
+    var html = '';
+    list.forEach(function(p) {
+      var pct  = p.total > 0 ? Math.round(p.attested / p.total * 100) : 0;
+      var pcol = pct >= 80 ? 'var(--success)' : pct >= 50 ? 'var(--warning)' : 'var(--danger)';
+      var attCell = p.total > 0
+        ? '<div style="font-size:12px;margin-bottom:3px">'+p.attested+'/'+p.total+'</div><div style="width:70px">'+progressBar(pct, pcol)+'</div>'
+        : '<span style="font-size:12px;color:var(--text-muted)">N/A</span>';
+      var rdColor = p.status === 'Expired' ? 'color:var(--danger)' : 'color:var(--text-muted)';
+      var rdExtra = p.status === 'Expired' ? ' ⚠' : '';
+      var action  = p.status === 'Expired' ? 'Renew' : 'View';
+      html += '<tr>'
+        + '<td><a href="policy-detail.html?id='+p.id+'" style="font-weight:600">'+p.title+'</a></td>'
+        + '<td style="font-size:12px">'+p.category+'</td>'
+        + '<td style="font-size:12px;font-weight:600">'+p.version+'</td>'
+        + '<td style="font-size:12px;color:var(--text-muted)">'+p.updated+'</td>'
+        + '<td>'+attCell+'</td>'
+        + '<td style="font-size:12px;'+rdColor+'">'+p.reviewDue+rdExtra+'</td>'
+        + '<td>'+statusBadge(p.status)+'</td>'
+        + '<td><a href="policy-detail.html?id='+p.id+'" class="btn btn-secondary btn-sm">'+action+'</a></td>'
+        + '</tr>';
+    });
+    document.getElementById('polBody').innerHTML = html;
   }
 
-  function filterTab(st,el){
-    tabFilter=st;
-    document.querySelectorAll('.pol-tab').forEach(t=>t.classList.remove('active'));
+  function filterTab(st, el) {
+    tabFilter = st;
+    document.querySelectorAll('.pol-tab').forEach(function(t){ t.classList.remove('active'); });
     el.classList.add('active');
     render();
   }
 
-  function approve(){
-    const pols=getPolicies();
-    const idx=pols.findIndex(p=>p.id==='POL-001');
-    if(idx!==-1){pols[idx].status='Published';savePolicies(pols);}
-    document.getElementById('approvalStrip').style.display='none';
+  function approvePolicy(id) {
+    var pols = getPolicies();
+    var idx  = pols.findIndex(function(p){ return p.id === id; });
+    if (idx !== -1) { pols[idx].status = 'Published'; savePolicies(pols); }
+    document.getElementById('apprStrip').style.display = 'none';
     showToast('Policy approved and published to all staff');
     render();
   }
 
-  function openNewModal(){ document.getElementById('newModal').style.display='flex'; }
-  function closeModal(){ document.getElementById('newModal').style.display='none'; }
-  function createPolicy(){
-    const title=document.getElementById('nTitle').value.trim();
-    if(!title){alert('Title is required.');return;}
-    const pols=getPolicies();
-    const id='POL-00'+(pols.length+1);
-    pols.push({id,title,category:document.getElementById('nCat').value,version:'v1.0',updated:new Date().toISOString().slice(0,10),attested:0,total:0,reviewDue:'—',status:'Under Review',cohsasa:document.getElementById('nCohsasa').value,owner:user.name,cycle:document.getElementById('nCycle').value,content:document.getElementById('nContent').value,byDept:{}});
-    savePolicies(pols);closeModal();showToast('Policy created and sent for review');render();
+  function openNew()  { document.getElementById('newModal').style.display = 'flex'; }
+  function closeNew() { document.getElementById('newModal').style.display = 'none'; }
+
+  function createPolicy() {
+    var title = document.getElementById('nTitle').value.trim();
+    if (!title) { alert('Title is required.'); return; }
+    var pols = getPolicies();
+    var id   = 'POL-00' + (pols.length + 1);
+    var today = new Date().toISOString().slice(0,10);
+    pols.push({ id:id, title:title, category:document.getElementById('nCat').value, version:'v1.0', updated:today, attested:0, total:0, reviewDue:'—', status:'Under Review', cohsasa:document.getElementById('nRef').value, owner:user.name, cycle:document.getElementById('nCycle').value, content:document.getElementById('nContent').value, byDept:{} });
+    savePolicies(pols);
+    closeNew();
+    showToast('Policy created and sent for review');
+    render();
   }
 
-  window.filterTab=filterTab; window.approve=approve; window.openNewModal=openNewModal; window.closeModal=closeModal; window.createPolicy=createPolicy;
+  window.filterTab    = filterTab;
+  window.approvePolicy= approvePolicy;
+  window.openNew      = openNew;
+  window.closeNew     = closeNew;
+  window.createPolicy = createPolicy;
+
   render();
 }
 </script>
