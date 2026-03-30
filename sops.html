@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOP Library — BAH Compliance</title>
+<script src="data.js"></script><script src="ui.js"></script>
+<style id="ws"></style>
+<style>
+.dept-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.dept-tab{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--win-border2);color:var(--text-muted);background:var(--win-surface);transition:all .12s;}
+.dept-tab:hover{border-color:var(--accent);color:var(--accent);}
+.dept-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.sop-card{background:var(--win-surface);border:1px solid var(--win-border);border-radius:8px;padding:14px 16px;transition:border-color .12s,box-shadow .12s;cursor:pointer;}
+.sop-card:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(0,103,192,.1);}
+.sop-icon{font-size:24px;margin-bottom:8px;}
+.sop-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.sop-dept{font-size:11px;color:var(--text-muted);margin-bottom:8px;}
+.sop-foot{display:flex;align-items:center;justify-content:space-between;}
+</style>
+</head>
+<body>
+<script>document.getElementById('ws').textContent=WIN_CSS;</script>
+<div class="shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="breadcrumb"><a href="dashboard.html">Home</a><span>›</span><span>SOPs</span></div>
+        <div class="page-title">SOP Library</div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="dateLabel"></span>
+        <button class="btn btn-primary btn-sm" onclick="showToast('Add SOP — opens version control workflow')">＋ Add SOP</button>
+      </div>
+    </div>
+    <div class="content">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">All Standard Operating Procedures — always showing latest approved version</div>
+
+      <div class="filter-row">
+        <div class="win-search"><span style="color:var(--text-muted)">🔍</span><input type="text" id="search" placeholder="Search SOPs…" oninput="render()"></div>
+      </div>
+      <div class="dept-tabs">
+        <div class="dept-tab active" onclick="filterDept('',this)">All Departments</div>
+        <div class="dept-tab" onclick="filterDept('Inpatient',this)">🛏 Inpatient</div>
+        <div class="dept-tab" onclick="filterDept('Pharmacy',this)">💊 Pharmacy</div>
+        <div class="dept-tab" onclick="filterDept('Laboratory',this)">🔬 Laboratory</div>
+        <div class="dept-tab" onclick="filterDept('Emergency',this)">🚨 Emergency</div>
+        <div class="dept-tab" onclick="filterDept('Dental',this)">🦷 Dental</div>
+        <div class="dept-tab" onclick="filterDept('Theatre',this)">⚙ Theatre</div>
+      </div>
+      <div class="sop-grid" id="sopGrid"></div>
+    </div>
+  </div>
+</div>
+<script>
+initData();
+const user=requireLogin();
+let dept='';
+if(user){
+  renderSidebar('sops');
+  document.getElementById('dateLabel').textContent=topbarDate();
+  function render(){
+    const q=document.getElementById('search').value.toLowerCase();
+    let sops=getSOPs();
+    if(dept) sops=sops.filter(s=>s.category===dept||s.category==='All');
+    if(q) sops=sops.filter(s=>s.title.toLowerCase().includes(q)||s.dept.toLowerCase().includes(q));
+    document.getElementById('sopGrid').innerHTML=sops.map(s=>`
+      <div class="sop-card" onclick="showToast('SOP viewer — would open PDF/document viewer')">
+        <div class="sop-icon">${s.icon}</div>
+        <div class="sop-title">${s.title}</div>
+        <div class="sop-dept">${s.dept}</div>
+        <div class="sop-foot">
+          ${statusBadge(s.status)}
+          <span style="font-size:11px;color:var(--text-muted)">${s.version} · Updated ${timeAgo(s.updated)}</span>
+        </div>
+      </div>`).join('');
+  }
+  function filterDept(d,el){dept=d;document.querySelectorAll('.dept-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');render();}
+  window.filterDept=filterDept;
+  render();
+}
+</script>
+</body>
+</html>

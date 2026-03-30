@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Incident Detail — BAH Compliance</title>
+<script src="data.js"></script><script src="ui.js"></script>
+<style id="ws"></style>
+<style>
+.detail-grid{display:grid;grid-template-columns:1fr 260px;gap:16px;}
+@media(max-width:800px){.detail-grid{grid-template-columns:1fr;}}
+.section-heading{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+.detail-box{background:var(--win-surface2);border:1px solid var(--win-border);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.7;margin-bottom:12px;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--win-border);font-size:12px;}
+.info-row:last-child{border-bottom:none;}
+.info-label{color:var(--text-muted);}
+.wf-vert{display:flex;flex-direction:column;gap:0;}
+.wfv-item{display:flex;gap:12px;position:relative;}
+.wfv-item::before{content:'';position:absolute;left:11px;top:28px;bottom:-10px;width:2px;background:var(--win-border2);}
+.wfv-item:last-child::before{display:none;}
+.wfv-circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--win-border2);background:var(--win-surface);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;z-index:1;}
+.wfv-item.done .wfv-circle{background:var(--accent);border-color:var(--accent);color:#fff;}
+.wfv-item.done::before{background:var(--accent);}
+.wfv-item.active .wfv-circle{border-color:var(--accent);color:var(--accent);}
+.wfv-body{padding-bottom:16px;}
+.wfv-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.wfv-sub{font-size:11px;color:var(--text-muted);}
+</style>
+</head>
+<body>
+<script>document.getElementById('ws').textContent=WIN_CSS;</script>
+<div class="shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="breadcrumb"><a href="dashboard.html">Home</a><span>›</span><a href="incidents.html">Incidents</a><span>›</span><span id="bId">—</span></div>
+        <div class="page-title" id="topTitle">Incident Investigation</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-secondary btn-sm" onclick="location.href='incidents.html'">← All incidents</button>
+      </div>
+    </div>
+    <div class="content" id="contentArea"><div style="padding:30px;color:var(--text-muted)">Loading…</div></div>
+  </div>
+</div>
+<script>
+initData();
+const user=requireLogin();
+const id=new URLSearchParams(location.search).get('id');
+if(user&&id){
+  renderSidebar('incidents');
+  const inc=getIncidents().find(i=>i.id===id);
+  if(!inc){document.getElementById('contentArea').innerHTML='<p style="padding:20px">Incident not found.</p>';}
+  else{
+    document.getElementById('bId').textContent=inc.id;
+    document.getElementById('topTitle').textContent=`${inc.id} — Investigation`;
+    document.title=inc.id+' — BAH Compliance';
+
+    const wfSteps=[
+      {title:'Report Received',      sub:`${inc.reporter==='Anonymous'?'Anonymous submission':'Staff report'} received via compliance system`,time:inc.reported+' · 07:12 AM',done:true},
+      {title:'Initial Review',       sub:'Quality Officer reviewed and classified severity and category',time:inc.reported+' · 08:30 AM',done:inc.step>=2},
+      {title:'Root Cause Analysis',  sub:'Investigating contributing factors',time:inc.step===3?'⏳ In progress — due '+new Date(new Date(inc.reported).getTime()+2*86400000).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'',done:inc.step>3,active:inc.step===3},
+      {title:'Corrective Action Plan',sub:'Define and assign corrective actions',time:'',done:inc.step>4,active:inc.step===4},
+      {title:'Close Investigation',  sub:'Verify actions complete, close and archive',time:'',done:inc.step>=5,active:false},
+    ];
+
+    const canManage=user.role==='quality'||user.role==='admin';
+
+    document.getElementById('contentArea').innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div>
+          <div style="font-size:17px;font-weight:600">${inc.id} — ${inc.desc}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:12px;color:var(--text-muted)">
+            ${inc.dept} · ${inc.type} · Reported ${timeAgo(inc.reported)}
+            ${statusBadge(inc.status)}
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Investigation Workflow</div>
+        <div class="wf-vert">${wfSteps.map((s,i)=>`
+          <div class="wfv-item ${s.done?'done':''} ${s.active?'active':''}">
+            <div class="wfv-circle">${s.done?'✔':i+1}</div>
+            <div class="wfv-body">
+              <div class="wfv-title" style="color:${s.done?'var(--accent)':s.active?'var(--text)':'var(--text-muted)'}">${i+1}. ${s.title}</div>
+              <div class="wfv-sub">${s.sub}</div>
+              ${s.time?`<div class="wfv-sub" style="margin-top:2px">${s.time}</div>`:''}
+            </div>
+          </div>`).join('')}
+        </div>
+        ${canManage&&inc.status!=='Closed'?`
+        <div style="display:flex;gap:8px;margin-top:8px;padding-top:12px;border-top:1px solid var(--win-border)">
+          <button class="btn btn-primary btn-sm" onclick="advance()">Advance Investigation →</button>
+          <button class="btn btn-secondary btn-sm" onclick="closeInc()">Close Investigation</button>
+        </div>`:''}
+      </div>
+
+      <div class="detail-grid">
+        <div>
+          <div class="section-heading">Incident Details</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px">What Happened</div>
+          <div class="detail-box">${inc.what}</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Contributing Factors</div>
+          <div class="detail-box">${inc.factors||'—'}</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Immediate Action Taken</div>
+          <div class="detail-box">${inc.action||'—'}</div>
+
+          <div class="card" style="margin-top:12px">
+            <div class="card-title">Related Policies</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--win-border)">
+                <div><div style="font-size:13px;font-weight:500">Medication Administration SOP</div><div style="font-size:11px;color:var(--text-muted)">v2.1 · Published</div></div>
+                <a href="policy-detail.html?id=POL-003" class="btn btn-secondary btn-sm">View</a>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
+                <div><div style="font-size:13px;font-weight:500">Infection Control Policy</div><div style="font-size:11px;color:var(--text-muted)">v4.2 · Pending Approval</div></div>
+                <a href="policy-detail.html?id=POL-001" class="btn btn-secondary btn-sm">View</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Incident Info</div>
+            <div class="info-row"><span class="info-label">Reference</span><span style="font-weight:700;color:var(--accent)">${inc.id}</span></div>
+            <div class="info-row"><span class="info-label">Type</span><span>${inc.type}</span></div>
+            <div class="info-row"><span class="info-label">Category</span><span>${inc.desc.includes('Medication')?'Medication Error':inc.desc.includes('fall')||inc.desc.includes('Fall')?'Patient Fall':'Other'}</span></div>
+            <div class="info-row"><span class="info-label">Department</span><span>${inc.dept}</span></div>
+            <div class="info-row"><span class="info-label">Reporter</span><span>${inc.reporter}</span></div>
+            <div class="info-row"><span class="info-label">Investigator</span><span>${inc.investigator}</span></div>
+            <div class="info-row"><span class="info-label">Status</span>${statusBadge(inc.status)}</div>
+          </div>
+          ${canManage?`<div style="margin-top:10px"><a href="corrective-actions.html" class="btn btn-secondary" style="width:100%;justify-content:center">🔧 View Corrective Actions</a></div>`:''}
+        </div>
+      </div>`;
+
+    function advance(){
+      const incs=getIncidents();const idx=incs.findIndex(i=>i.id===id);
+      if(idx!==-1&&incs[idx].step<5){incs[idx].step++;if(incs[idx].step>=5)incs[idx].status='Closed';saveIncidents(incs);}
+      showToast('Investigation advanced to next step');setTimeout(()=>location.reload(),1200);
+    }
+    function closeInc(){
+      const incs=getIncidents();const idx=incs.findIndex(i=>i.id===id);
+      if(idx!==-1){incs[idx].status='Closed';incs[idx].step=5;saveIncidents(incs);}
+      showToast('Investigation closed');setTimeout(()=>location.href='incidents.html',1200);
+    }
+    window.advance=advance;window.closeInc=closeInc;
+  }
+}
+</script>
+</body>
+</html>
