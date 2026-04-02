@@ -1,110 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BAH Compliance — Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="data.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;background:#f3f3f3;}
-.left{width:420px;flex-shrink:0;background:#fff;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;padding:40px 44px;}
-.right{flex:1;background:linear-gradient(160deg,#0067c0 0%,#004b8f 50%,#002d5c 100%);display:flex;align-items:center;justify-content:center;padding:40px;position:relative;overflow:hidden;}
-.right::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(255,255,255,.06) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(255,255,255,.08) 0%,transparent 50%);}
-.rp{position:relative;z-index:1;color:#fff;max-width:380px;text-align:center;}
-.rp-icon{font-size:52px;margin-bottom:18px;}
-.rp-title{font-size:22px;font-weight:300;margin-bottom:8px;line-height:1.3;}
-.rp-sub{font-size:13px;opacity:.75;line-height:1.6;margin-bottom:28px;}
-.rp-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:8px 16px;font-size:12px;margin-bottom:8px;}
-.rp-pills{display:flex;flex-direction:column;align-items:center;gap:6px;}
-.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:30px;}
-.logo-box{width:34px;height:34px;background:#0067c0;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;}
-.logo-text{font-size:13px;font-weight:600;color:#1a1a1a;line-height:1.2;}
-.logo-sub{font-size:11px;color:#888;}
-h1{font-size:20px;font-weight:600;margin-bottom:4px;}
-.sub{font-size:13px;color:#666;margin-bottom:26px;}
-.fg{margin-bottom:14px;}
-label{display:block;font-size:12px;font-weight:600;color:#333;margin-bottom:5px;}
-input{width:100%;background:#fff;border:1px solid #ccc;border-radius:4px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#1a1a1a;outline:none;transition:border-color .15s,box-shadow .15s;}
-input:focus{border-color:#0067c0;box-shadow:0 0 0 2px rgba(0,103,192,.15);}
-.roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
-.role-btn{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:10px 8px;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;font-size:12px;color:#666;transition:all .12s;}
-.role-btn.active{background:#dce9f9;border-color:#0067c0;color:#0067c0;font-weight:600;}
-.role-btn .ri{font-size:18px;display:block;margin-bottom:3px;}
-.btn-login{width:100%;background:#0067c0;color:#fff;border:1px solid #0067c0;border-radius:4px;padding:9px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s;}
-.btn-login:hover{background:#005ba4;}
-.divider{display:flex;align-items:center;gap:10px;margin:16px 0;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e0e0e0;}
-.divider span{font-size:11px;color:#aaa;}
-.demos{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.demo{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px 10px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .12s;text-align:left;}
-.demo:hover{border-color:#0067c0;}
-.demo strong{display:block;font-size:12px;color:#0067c0;}
-.demo span{font-size:11px;color:#888;}
-.err{background:#fde7e9;border:1px solid #f4aaaa;border-radius:4px;padding:8px 12px;font-size:12px;color:#c42b1c;margin-bottom:12px;display:none;}
-.footer-note{margin-top:auto;font-size:11px;color:#aaa;text-align:center;padding-top:18px;}
-@media(max-width:700px){.left{width:100%}.right{display:none}}
-</style>
-</head>
-<body>
-<div class="left">
-  <div class="logo-row">
-    <div class="logo-box">TN</div>
-    <div><div class="logo-text">TechNexus Compliance</div><div class="logo-sub">BAH Instance</div></div>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAH Compliance & Quality Platform</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<button class="menu-toggle" onclick="CMP.toggleMenu()">☰</button>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="logo-icon">BAH</div><h2>Compliance<span>Blantyre Adventist Hospital</span></h2></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Overview</div>
+    <a href="#" data-page="pg-dash" data-title="Dashboard" class="active"><span class="icon">📊</span>Dashboard</a>
+    <a href="#" data-page="pg-cohsasa" data-title="COHSASA Readiness"><span class="icon">🏥</span>COHSASA Readiness</a>
+    <div class="nav-section">Documents</div>
+    <a href="#" data-page="pg-policies" data-title="Policies & SOPs"><span class="icon">📜</span>Policies & SOPs</a>
+    <a href="#" data-page="pg-attest" data-title="Attestation Tracker"><span class="icon">✅</span>Attestation</a>
+    <div class="nav-section">Safety</div>
+    <a href="#" data-page="pg-incidents" data-title="Incidents & Near Misses"><span class="icon">⚠️</span>Incidents<span class="badge-count" id="nav-inc">0</span></a>
+    <a href="#" data-page="pg-report" data-title="Report Incident"><span class="icon">🚨</span>Report Incident</a>
+    <a href="#" data-page="pg-actions" data-title="Corrective Actions"><span class="icon">🔧</span>Corrective Actions</a>
+    <div class="nav-section">Performance</div>
+    <a href="#" data-page="pg-kpis" data-title="KPI Dashboard"><span class="icon">📈</span>KPIs</a>
+  </nav>
+  <div class="sidebar-footer">© 2026 TechNexus Malawi<br>BAH Compliance v1.0</div>
+</aside>
+
+<div class="main">
+<header class="topbar">
+  <div class="topbar-left"><h1 id="page-title">Dashboard</h1></div>
+  <div class="topbar-right">
+    <button class="topbar-btn" title="Notifications">🔔<span class="dot"></span></button>
+    <div class="user-info"><div class="avatar">QM</div><span class="name">Quality Manager</span></div>
   </div>
-  <h1>Sign In</h1>
-  <p class="sub">Blantyre Adventist Hospital — Compliance &amp; Quality Platform</p>
-  <div class="err" id="err">Incorrect credentials. Please try a demo account.</div>
-  <div class="fg"><label>Username / Email</label><input type="email" id="email" value="quality@bah.mw"></div>
-  <div class="fg"><label>Password</label><input type="password" id="pass" value="password"></div>
-  <div style="margin-bottom:16px">
-    <label style="margin-bottom:8px">Sign in as</label>
-    <div class="roles">
-      <div class="role-btn active" data-role="quality" onclick="pick(this)"><span class="ri">🛡️</span>Quality Officer</div>
-      <div class="role-btn"        data-role="staff"   onclick="pick(this)"><span class="ri">🏥</span>Clinical Staff</div>
-      <div class="role-btn"        data-role="ceo"     onclick="pick(this)"><span class="ri">📊</span>CEO / Executive</div>
-      <div class="role-btn"        data-role="admin"   onclick="pick(this)"><span class="ri">⚙️</span>Administrator</div>
-    </div>
+</header>
+<div class="content">
+
+<!-- DASHBOARD -->
+<div id="pg-dash" class="page active">
+  <div class="kpi-grid" id="d-kpis"></div>
+  <div class="grid-2">
+    <div class="card"><div class="card-header"><h3>Recent Incidents</h3><a href="#" class="btn btn-sm btn-danger" onclick="nav('pg-report');return false">+ Report</a></div><div class="card-body tbl-wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Severity</th><th>Status</th></tr></thead><tbody id="d-inc"></tbody></table></div></div>
+    <div class="card"><div class="card-header"><h3>Policy Compliance</h3></div><div class="card-body" id="d-pol"></div></div>
   </div>
-  <button class="btn-login" onclick="login()">Sign In →</button>
-  <div class="divider"><span>Quick demo access</span></div>
-  <div class="demos">
-    <div class="demo" onclick="quick('quality@bah.mw','quality')"><strong>🛡️ Quality Officer</strong><span>Quality Officer Banda</span></div>
-    <div class="demo" onclick="quick('nurse@bah.mw','staff')"><strong>🏥 Clinical Staff</strong><span>Nurse Phiri</span></div>
-    <div class="demo" onclick="quick('ceo@bah.mw','ceo')"><strong>📊 CEO</strong><span>CEO Mwale</span></div>
-    <div class="demo" onclick="quick('admin@bah.mw','admin')"><strong>⚙️ Administrator</strong><span>System Administrator</span></div>
-  </div>
-  <div class="footer-note">All actions are logged with full audit trail · TechNexus v1.0</div>
-</div>
-<div class="right">
-  <div class="rp">
-    <div class="rp-icon">🏥</div>
-    <div class="rp-title"><strong>Blantyre Adventist Hospital</strong><br>Compliance &amp; Quality Platform</div>
-    <div class="rp-sub">Manage COHSASA accreditation, incident reporting, policy attestation, SOPs, KPIs, and corrective actions — all in one place.</div>
-    <div class="rp-pills">
-      <div class="rp-pill">✔ COHSASA 5-Star Accreditation Ready</div>
-      <div class="rp-pill">📋 Policy &amp; SOP Management</div>
-      <div class="rp-pill">⚠ Incident &amp; Near Miss Reporting</div>
-      <div class="rp-pill">📊 KPI Monitoring &amp; Export</div>
-    </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-header"><h3>Open Corrective Actions</h3></div><div class="card-body" id="d-actions"></div></div>
+    <div class="card"><div class="card-header"><h3>KPI Snapshot</h3></div><div class="card-body" id="d-kpi-snap"></div></div>
   </div>
 </div>
+
+<!-- COHSASA -->
+<div id="pg-cohsasa" class="page">
+  <div class="grid-2" style="align-items:start">
+    <div class="card"><div class="card-header"><h3>COHSASA Accreditation Readiness</h3></div><div class="card-body">
+      <div class="gauge-wrap" id="cohsasa-gauge"></div>
+      <p style="font-size:.82rem;color:var(--text-secondary);text-align:center;margin-bottom:16px">Target: 5-Star Rating — Next Audit: June 2026</p>
+      <div class="meta-list" id="cohsasa-meta"></div>
+    </div></div>
+    <div class="card"><div class="card-header"><h3>Readiness Checklist</h3></div><div class="card-body" id="cohsasa-checklist"></div></div>
+  </div>
+</div>
+
+<!-- POLICIES & SOPs -->
+<div id="pg-policies" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-outline pol-filter active" data-f="all">All</button>
+      <button class="btn btn-sm btn-outline pol-filter" data-f="active">Active</button>
+      <button class="btn btn-sm btn-outline pol-filter" data-f="review">Under Review</button>
+      <button class="btn btn-sm btn-outline pol-filter" data-f="draft">Draft</button>
+    </div>
+  </div>
+  <div class="card"><div class="card-body tbl-wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Dept</th><th>Version</th><th>Status</th><th>Owner</th><th>Review Due</th><th>Attestation</th></tr></thead><tbody id="pol-tbody"></tbody></table></div></div>
+</div>
+
+<!-- POLICY DETAIL -->
+<div id="pg-pol-detail" class="page">
+  <div style="margin-bottom:14px"><a href="#" onclick="nav('pg-policies');return false" style="font-size:.82rem">← Back to Policies</a></div>
+  <div class="grid-2" style="align-items:start">
+    <div class="card"><div class="card-header"><h3 id="pold-title"></h3><span class="badge" id="pold-status"></span></div>
+      <div class="card-body"><p style="font-size:.88rem;color:var(--text-secondary);line-height:1.8;white-space:pre-line" id="pold-content"></p></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>Document Details</h3></div><div class="card-body"><div class="meta-list" id="pold-meta"></div></div></div>
+  </div>
+</div>
+
+<!-- ATTESTATION -->
+<div id="pg-attest" class="page">
+  <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:16px">Track staff acknowledgement of active policies and SOPs. Click the checkbox to simulate an attestation.</p>
+  <div class="card"><div class="card-body" id="attest-list"></div></div>
+</div>
+
+<!-- INCIDENTS -->
+<div id="pg-incidents" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-outline inc-filter active" data-f="all">All</button>
+      <button class="btn btn-sm btn-outline inc-filter" data-f="open">Open</button>
+      <button class="btn btn-sm btn-outline inc-filter" data-f="investigating">Investigating</button>
+      <button class="btn btn-sm btn-outline inc-filter" data-f="closed">Closed</button>
+    </div>
+    <a href="#" class="btn btn-sm btn-danger" onclick="nav('pg-report');return false">+ Report Incident</a>
+  </div>
+  <div class="card"><div class="card-body tbl-wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Severity</th><th>Dept</th><th>Date</th><th>Status</th><th>Investigator</th></tr></thead><tbody id="inc-tbody"></tbody></table></div></div>
+</div>
+
+<!-- INCIDENT DETAIL -->
+<div id="pg-inc-detail" class="page">
+  <div style="margin-bottom:14px"><a href="#" onclick="nav('pg-incidents');return false" style="font-size:.82rem">← Back to Incidents</a></div>
+  <div class="grid-2" style="align-items:start">
+    <div>
+      <div class="card"><div class="card-header"><h3 id="incd-id"></h3><div id="incd-actions"></div></div>
+        <div class="card-body">
+          <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:8px" id="incd-title"></h2>
+          <p style="font-size:.88rem;color:var(--text-secondary);line-height:1.7" id="incd-desc"></p>
+          <div style="margin-top:12px;padding:12px;background:var(--amber-light);border-radius:var(--radius)" id="incd-root" style="display:none"></div>
+        </div></div>
+      <div class="card"><div class="card-header"><h3>Investigation Timeline</h3></div><div class="card-body">
+        <div style="margin-bottom:12px;display:flex;gap:8px"><input type="text" id="incd-note-input" placeholder="Add investigation note..." style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.82rem"><button class="btn btn-sm btn-primary" id="incd-note-btn">Add</button></div>
+        <div class="timeline" id="incd-timeline"></div>
+      </div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>Details</h3></div><div class="card-body"><div class="meta-list" id="incd-meta"></div></div></div>
+  </div>
+</div>
+
+<!-- REPORT INCIDENT -->
+<div id="pg-report" class="page">
+  <div class="card" style="max-width:680px">
+    <div class="card-header"><h3>Report an Incident or Near Miss</h3></div>
+    <div class="card-body">
+      <div style="padding:12px;background:var(--primary-light);border-radius:var(--radius);margin-bottom:16px;font-size:.82rem;color:var(--primary)">🛡️ Reports can be submitted anonymously. Your identity will not be disclosed without consent.</div>
+      <form id="inc-form">
+        <div class="form-row">
+          <div class="form-group"><label>Event Type</label><select id="rf-type" required><option value="incident">Incident</option><option value="near-miss">Near Miss</option></select></div>
+          <div class="form-group"><label>Severity</label><select id="rf-sev" required><option value="no-harm">No Harm</option><option value="near-miss">Near Miss</option><option value="minor">Minor</option><option value="major">Major</option><option value="sentinel">Sentinel Event</option></select></div>
+        </div>
+        <div class="form-group"><label>Title / Summary</label><input type="text" id="rf-title" placeholder="Brief description" required></div>
+        <div class="form-row">
+          <div class="form-group"><label>Department / Location</label><input type="text" id="rf-dept" placeholder="e.g. Ward 2, Theatre, OPD" required></div>
+          <div class="form-group"><label>Date of Event</label><input type="date" id="rf-date" required></div>
+        </div>
+        <div class="form-group"><label>Description</label><textarea id="rf-desc" placeholder="What happened? Include all relevant details..." required></textarea></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="rf-anon" checked style="width:auto"><label for="rf-anon" style="text-transform:none;font-weight:400;margin:0;cursor:pointer">Report anonymously</label></div>
+        <button type="submit" class="btn btn-danger btn-block">Submit Report</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CORRECTIVE ACTIONS -->
+<div id="pg-actions" class="page">
+  <div class="card"><div class="card-header"><h3>Corrective Actions Register</h3><span style="font-size:.72rem;color:var(--text-muted)" id="ca-summary"></span></div>
+    <div class="card-body tbl-wrap"><table><thead><tr><th>ID</th><th>Linked Incident</th><th>Action</th><th>Assigned To</th><th>Due Date</th><th>Status</th></tr></thead><tbody id="ca-tbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div id="pg-kpis" class="page">
+  <div class="kpi-grid" id="kpi-summary"></div>
+  <div class="card"><div class="card-header"><h3>KPI Performance — Current Period</h3></div>
+    <div class="card-body tbl-wrap"><table><thead><tr><th>KPI</th><th>Department</th><th>Target</th><th>Actual</th><th>Unit</th><th>Status</th><th>Trend</th><th>Progress</th></tr></thead><tbody id="kpi-tbody"></tbody></table></div>
+  </div>
+</div>
+
+</div></div></div>
+
+<script src="js/app.js"></script>
 <script>
-initData();
-var role = 'quality';
-function pick(el) { role = el.dataset.role; document.querySelectorAll('.role-btn').forEach(function(b){ b.classList.remove('active'); }); el.classList.add('active'); }
-function quick(email, r) { document.getElementById('email').value = email; document.getElementById('pass').value = 'password'; role = r; document.querySelectorAll('.role-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.role === r); }); setTimeout(login, 150); }
-function login() {
-  var e = document.getElementById('email').value.trim();
-  var p = document.getElementById('pass').value;
-  if (DEMO_USERS[e] && p === 'password') {
-    var u = Object.assign({}, DEMO_USERS[e], { role: role, email: e });
-    localStorage.setItem(USER_KEY, JSON.stringify(u));
-    var dest = { quality:'dashboard.html', staff:'attestations.html', ceo:'kpi.html', admin:'settings.html' };
-    window.location.href = dest[role] || 'dashboard.html';
-  } else { document.getElementById('err').style.display = 'block'; }
+function nav(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
+  const pg=document.getElementById(id), lk=document.querySelector(`[data-page="${id}"]`);
+  if(pg)pg.classList.add('active');
+  if(lk){lk.classList.add('active');document.getElementById('page-title').textContent=lk.dataset.title||'Dashboard';}
+  document.querySelector('.sidebar')?.classList.remove('open');
+  if(id==='pg-dash')renderDash(); if(id==='pg-policies')renderPolicies(); if(id==='pg-attest')renderAttest();
+  if(id==='pg-incidents')renderIncidents(); if(id==='pg-actions')renderActions(); if(id==='pg-kpis')renderKPIs();
+  if(id==='pg-cohsasa')renderCOHSASA();
 }
-document.addEventListener('keydown', function(e){ if(e.key==='Enter') login(); });
+document.querySelectorAll('.sidebar-nav a[data-page]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();nav(a.dataset.page);});});
+
+// ===== DASHBOARD =====
+function renderDash(){
+  const s=CMP.getStats();
+  document.getElementById('nav-inc').textContent=s.openIncidents;
+  document.getElementById('d-kpis').innerHTML=`
+    <div class="kpi teal"><div class="kpi-label">Active Policies</div><div class="kpi-value">${s.activePolicies}</div><div class="kpi-sub">${s.reviewPolicies} under review, ${s.draftPolicies} draft</div></div>
+    <div class="kpi red"><div class="kpi-label">Open Incidents</div><div class="kpi-value">${s.openIncidents}</div><div class="kpi-sub">${s.totalIncidents} total reported</div></div>
+    <div class="kpi amber"><div class="kpi-label">Near Misses</div><div class="kpi-value">${s.nearMisses}</div><div class="kpi-sub">${s.sentinelEvents} sentinel events</div></div>
+    <div class="kpi blue"><div class="kpi-label">Attestation Rate</div><div class="kpi-value">${Math.round(s.avgAttestation)}%</div><div class="kpi-sub">Target: 95%</div></div>
+    <div class="kpi purple"><div class="kpi-label">Open Actions</div><div class="kpi-value">${s.openActions}</div><div class="kpi-sub">${s.closedActions} closed</div></div>
+    <div class="kpi green"><div class="kpi-label">KPIs On Track</div><div class="kpi-value">${s.kpisMet}/${s.kpisTotal}</div></div>`;
+  const incs=CMP.getIncidents().slice(-5).reverse();
+  document.getElementById('d-inc').innerHTML=incs.map(i=>`<tr onclick="viewIncident('${i.id}')"><td style="font-weight:600;color:var(--primary)">${i.id}</td><td>${i.title.substring(0,35)}...</td><td>${i.type}</td><td><span class="sev-dot ${i.severity}"></span>${i.severity}</td><td><span class="badge badge-${i.status}">${i.status}</span></td></tr>`).join('');
+  const pols=CMP.getPolicies().filter(p=>p.status==='active');
+  document.getElementById('d-pol').innerHTML=pols.slice(0,4).map(p=>{const pct=Math.round(p.attestCount/p.attestTarget*100);return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span>${p.title.substring(0,35)}...</span><span>${pct}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct>=90?'var(--green)':pct>=60?'var(--yellow)':'var(--red)'}"></div></div></div>`;}).join('');
+  const acts=CMP.getActions().filter(a=>a.status==='open');
+  document.getElementById('d-actions').innerHTML=acts.length?acts.map(a=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.82rem"><span>${a.id} — ${a.action.substring(0,40)}...</span><span style="color:var(--red)">${CMP.formatDate(a.dueDate)}</span></div>`).join(''):'<p style="font-size:.82rem;color:var(--text-muted)">No open corrective actions.</p>';
+  const kpis=CMP.getKPIs().slice(0,4);
+  document.getElementById('d-kpi-snap').innerHTML=kpis.map(k=>{const met=(k.name.includes('Error')||k.name.includes('Fall'))?k.actual<=k.target:k.actual>=k.target;return`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.82rem"><span>${k.name}</span><span style="color:${met?'var(--green)':'var(--red)'}">${k.actual}${k.unit==='%'?'%':' '+k.unit} / ${k.target}${k.unit==='%'?'%':''}</span></div>`;}).join('');
+}
+
+// ===== COHSASA =====
+function renderCOHSASA(){
+  const s=CMP.getStats();
+  const pct=s.cohsasaScore;
+  document.getElementById('cohsasa-gauge').innerHTML=`<div class="gauge-ring" style="--gauge-pct:${pct}%"><div class="gauge-inner"><div class="num">${pct}%</div><div class="lbl">Readiness</div></div></div><p style="font-size:.78rem;color:var(--text-muted)">Based on policy attestation completion</p>`;
+  const checklist=[
+    {item:'Infection Control Policy Active & Attested',done:true},{item:'Patient Safety SOPs Published',done:true},
+    {item:'Fire Evacuation Plan Current',done:true},{item:'All Equipment Maintenance Up-to-date',done:false},
+    {item:'Incident Reporting System Operational',done:true},{item:'Staff Attestation Rate ≥ 95%',done:pct>=95},
+    {item:'Near Miss Reporting Culture Established',done:true},{item:'Sentinel Event RCA Completed',done:true},
+    {item:'Data Protection Policy Approved',done:false},{item:'All KPIs Tracked Monthly',done:true},
+  ];
+  document.getElementById('cohsasa-checklist').innerHTML=checklist.map(c=>`<div class="attest-item"><div class="attest-check ${c.done?'checked':''}">${c.done?'✓':''}</div><span class="title">${c.item}</span></div>`).join('');
+  document.getElementById('cohsasa-meta').innerHTML=`
+    <div class="meta-row"><span class="label">Target Rating</span><span class="value">5-Star</span></div>
+    <div class="meta-row"><span class="label">Next Audit</span><span class="value">June 2026</span></div>
+    <div class="meta-row"><span class="label">Active Policies</span><span class="value">${s.activePolicies}</span></div>
+    <div class="meta-row"><span class="label">Attestation Rate</span><span class="value" style="color:${pct>=90?'var(--green)':'var(--amber)'}">${pct}%</span></div>
+    <div class="meta-row"><span class="label">Open Incidents</span><span class="value">${s.openIncidents}</span></div>
+    <div class="meta-row"><span class="label">Sentinel Events</span><span class="value" style="color:${s.sentinelEvents?'var(--red)':'var(--green)'}">${s.sentinelEvents}</span></div>
+    <div class="meta-row"><span class="label">Open Corrective Actions</span><span class="value">${s.openActions}</span></div>`;
+}
+
+// ===== POLICIES =====
+function renderPolicies(filter='all'){
+  const pols=CMP.getPolicies();
+  const filtered=filter==='all'?pols:pols.filter(p=>p.status===filter);
+  document.getElementById('pol-tbody').innerHTML=filtered.map(p=>{const pct=p.attestTarget?Math.round(p.attestCount/p.attestTarget*100):0;return`<tr onclick="viewPolicy('${p.id}')"><td style="font-weight:600;color:var(--primary)">${p.id}</td><td>${p.title}</td><td>${p.category}</td><td>${p.dept}</td><td>${p.version}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.owner}</td><td>${CMP.formatDate(p.reviewDate)}</td><td><div style="display:flex;align-items:center;gap:6px"><div class="prog-bar" style="width:60px"><div class="prog-fill" style="width:${pct}%;background:${pct>=90?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:.7rem">${pct}%</span></div></td></tr>`;}).join('');
+}
+document.querySelectorAll('.pol-filter').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.pol-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderPolicies(b.dataset.f);});});
+
+function viewPolicy(id){
+  nav('pg-pol-detail');const p=CMP.getPolicy(id);if(!p)return;
+  document.getElementById('page-title').textContent=p.id;
+  document.getElementById('pold-title').textContent=p.title;
+  document.getElementById('pold-status').className=`badge badge-${p.status}`;document.getElementById('pold-status').textContent=p.status;
+  document.getElementById('pold-content').textContent=p.content;
+  const pct=p.attestTarget?Math.round(p.attestCount/p.attestTarget*100):0;
+  document.getElementById('pold-meta').innerHTML=`
+    <div class="meta-row"><span class="label">ID</span><span class="value">${p.id}</span></div>
+    <div class="meta-row"><span class="label">Type</span><span class="value">${p.category}</span></div>
+    <div class="meta-row"><span class="label">Department</span><span class="value">${p.dept}</span></div>
+    <div class="meta-row"><span class="label">Version</span><span class="value">${p.version}</span></div>
+    <div class="meta-row"><span class="label">Owner</span><span class="value">${p.owner}</span></div>
+    <div class="meta-row"><span class="label">Approved By</span><span class="value">${p.approvedBy||'Pending'}</span></div>
+    <div class="meta-row"><span class="label">Approved Date</span><span class="value">${CMP.formatDate(p.approvedDate)}</span></div>
+    <div class="meta-row"><span class="label">Next Review</span><span class="value">${CMP.formatDate(p.reviewDate)}</span></div>
+    <div class="meta-row"><span class="label">Attestation</span><span class="value">${p.attestCount}/${p.attestTarget} (${pct}%)</span></div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct>=90?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'}"></div></div>`;
+}
+
+// ===== ATTESTATION =====
+function renderAttest(){
+  const pols=CMP.getPolicies().filter(p=>p.status==='active');
+  document.getElementById('attest-list').innerHTML=pols.map(p=>{const pct=Math.round(p.attestCount/p.attestTarget*100);return`<div class="attest-item"><div class="attest-check ${pct>=95?'checked':''}" onclick="doAttest('${p.id}')">${pct>=95?'✓':''}</div><span class="title">${p.title}</span><span class="dept">${p.attestCount}/${p.attestTarget} (${pct}%)</span></div>`;}).join('');
+}
+function doAttest(id){CMP.toggleAttestation(id);renderAttest();CMP.toast('Attestation recorded');}
+
+// ===== INCIDENTS =====
+function renderIncidents(filter='all'){
+  const incs=CMP.getIncidents().slice().reverse();
+  const filtered=filter==='all'?incs:incs.filter(i=>i.status===filter);
+  document.getElementById('inc-tbody').innerHTML=filtered.map(i=>`<tr onclick="viewIncident('${i.id}')"><td style="font-weight:600;color:var(--primary)">${i.id}</td><td>${i.title.substring(0,35)}...</td><td>${i.type}</td><td><span class="sev-dot ${i.severity}"></span>${i.severity}</td><td>${i.dept}</td><td>${CMP.formatDate(i.reportDate)}</td><td><span class="badge badge-${i.status}">${i.status}</span></td><td>${i.investigator}</td></tr>`).join('');
+}
+document.querySelectorAll('.inc-filter').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.inc-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderIncidents(b.dataset.f);});});
+
+function viewIncident(id){
+  nav('pg-inc-detail');const i=CMP.getIncident(id);if(!i)return;
+  document.getElementById('page-title').textContent=i.id;
+  document.getElementById('incd-id').textContent=i.id;document.getElementById('incd-title').textContent=i.title;
+  document.getElementById('incd-desc').textContent=i.description;
+  const root=document.getElementById('incd-root');
+  if(i.rootCause){root.style.display='block';root.innerHTML=`<strong style="font-size:.78rem;color:var(--amber)">Root Cause:</strong><p style="font-size:.82rem;margin-top:4px">${i.rootCause}</p>`;}else{root.style.display='none';}
+  const acts=document.getElementById('incd-actions');
+  const btns=[];
+  if(i.status==='open')btns.push(`<button class="btn btn-sm btn-primary" onclick="chgInc('${i.id}','investigating')">Investigate</button>`);
+  if(i.status==='investigating')btns.push(`<button class="btn btn-sm btn-success" onclick="chgInc('${i.id}','closed')">Close</button>`);
+  acts.innerHTML=btns.join('');
+  document.getElementById('incd-meta').innerHTML=`
+    <div class="meta-row"><span class="label">Status</span><span class="value"><span class="badge badge-${i.status}">${i.status}</span></span></div>
+    <div class="meta-row"><span class="label">Type</span><span class="value">${i.type}</span></div>
+    <div class="meta-row"><span class="label">Severity</span><span class="value"><span class="sev-dot ${i.severity}"></span>${i.severity}</span></div>
+    <div class="meta-row"><span class="label">Department</span><span class="value">${i.dept}</span></div>
+    <div class="meta-row"><span class="label">Reporter</span><span class="value">${i.reporter}</span></div>
+    <div class="meta-row"><span class="label">Date</span><span class="value">${CMP.formatDate(i.reportDate)}</span></div>
+    <div class="meta-row"><span class="label">Investigator</span><span class="value">${i.investigator}</span></div>
+    <div class="meta-row"><span class="label">Corrective Action</span><span class="value">${i.correctiveAction||'None yet'}</span></div>`;
+  document.getElementById('incd-timeline').innerHTML=i.notes.slice().reverse().map(n=>`<div class="timeline-item"><div class="tl-dot">${n.by==='System'?'⚙':'💬'}</div><div class="tl-content"><h4>${n.by}</h4><p>${CMP.formatDateTime(n.ts)}</p><div class="note">${n.text}</div></div></div>`).join('');
+  document.getElementById('incd-note-btn').onclick=()=>{const inp=document.getElementById('incd-note-input');if(!inp.value.trim())return;CMP.addIncidentNote(i.id,inp.value.trim());inp.value='';viewIncident(i.id);CMP.toast('Note added');};
+}
+function chgInc(id,status){const note=prompt(`Add investigation note for status "${status}":`);CMP.updateIncidentStatus(id,status,note||`Status → ${status}`);viewIncident(id);CMP.toast(`Incident ${status}`);}
+
+// ===== REPORT FORM =====
+document.getElementById('inc-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const inc=CMP.reportIncident({title:document.getElementById('rf-title').value,type:document.getElementById('rf-type').value,severity:document.getElementById('rf-sev').value,dept:document.getElementById('rf-dept').value,description:document.getElementById('rf-desc').value,anonymous:document.getElementById('rf-anon').checked});
+  CMP.toast(`${inc.id} reported`);document.getElementById('inc-form').reset();viewIncident(inc.id);
+});
+
+// ===== CORRECTIVE ACTIONS =====
+function renderActions(){
+  const acts=CMP.getActions();
+  document.getElementById('ca-summary').textContent=`${acts.filter(a=>a.status==='open').length} open / ${acts.length} total`;
+  document.getElementById('ca-tbody').innerHTML=acts.map(a=>`<tr><td style="font-weight:600">${a.id}</td><td style="color:var(--primary)">${a.incidentId}</td><td>${a.action.substring(0,50)}...</td><td>${a.assignee}</td><td>${CMP.formatDate(a.dueDate)}</td><td><span class="badge badge-${a.status==='open'?'open':'closed'}">${a.status}</span></td></tr>`).join('');
+}
+
+// ===== KPIs =====
+function renderKPIs(){
+  const kpis=CMP.getKPIs();const met=kpis.filter(k=>(k.name.includes('Error')||k.name.includes('Fall'))?k.actual<=k.target:k.actual>=k.target).length;
+  document.getElementById('kpi-summary').innerHTML=`
+    <div class="kpi green"><div class="kpi-label">KPIs Met</div><div class="kpi-value">${met}/${kpis.length}</div></div>
+    <div class="kpi red"><div class="kpi-label">KPIs At Risk</div><div class="kpi-value">${kpis.length-met}</div></div>
+    <div class="kpi teal"><div class="kpi-label">Overall Score</div><div class="kpi-value">${Math.round(met/kpis.length*100)}%</div></div>`;
+  document.getElementById('kpi-tbody').innerHTML=kpis.map(k=>{
+    const isBad=k.name.includes('Error')||k.name.includes('Fall');
+    const met=isBad?k.actual<=k.target:k.actual>=k.target;
+    const pct=isBad?Math.max(0,100-k.actual/Math.max(k.target,1)*100):Math.min(100,k.actual/(k.target||1)*100);
+    return`<tr><td><strong>${k.name}</strong></td><td>${k.dept}</td><td>${k.target}${k.unit==='%'?'%':' '+k.unit}</td><td>${k.actual}${k.unit==='%'?'%':' '+k.unit}</td><td>${k.unit}</td><td><span class="badge badge-${met?'met':'missed'}">${met?'Met':'At Risk'}</span></td><td>${k.trend==='up'?'📈':k.trend==='down'?'📉':'➡️'}</td><td><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:${Math.min(100,pct)}%;background:${met?'var(--green)':'var(--red)'}"></div></div></td></tr>`;
+  }).join('');
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>renderDash());
 </script>
-</body>
-</html>
+</body></html>
