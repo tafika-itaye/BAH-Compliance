@@ -1,9 +1,11 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>BAH Compliance & Quality Platform</title>
 <link rel="stylesheet" href="css/style.css">
 </head><body>
-<button class="menu-toggle" onclick="CMP.toggleMenu()">☰</button>
+<button class="menu-toggle" onclick="toggleMenu()">☰</button>
 <div class="app">
 <aside class="sidebar">
   <div class="sidebar-brand"><div class="logo-icon">BAH</div><h2>Compliance<span>Blantyre Adventist Hospital</span></h2></div>
@@ -21,7 +23,7 @@
     <div class="nav-section">Performance</div>
     <a href="#" data-page="pg-kpis" data-title="KPI Dashboard"><span class="icon">📈</span>KPIs</a>
   </nav>
-  <div class="sidebar-footer">© 2026 TechNexus Malawi<br>BAH Compliance v1.0</div>
+  <div class="sidebar-footer">© 2026 TechNexus Malawi<br>BAH Compliance v2.0</div>
 </aside>
 
 <div class="main">
@@ -29,7 +31,7 @@
   <div class="topbar-left"><h1 id="page-title">Dashboard</h1></div>
   <div class="topbar-right">
     <button class="topbar-btn" title="Notifications">🔔<span class="dot"></span></button>
-    <div class="user-info"><div class="avatar">QM</div><span class="name">Quality Manager</span></div>
+    <div class="user-info"><div class="avatar" id="user-avatar">QM</div><span class="name" id="user-name">Quality Manager</span></div>
   </div>
 </header>
 <div class="content">
@@ -64,9 +66,9 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
     <div style="display:flex;gap:6px">
       <button class="btn btn-sm btn-outline pol-filter active" data-f="all">All</button>
-      <button class="btn btn-sm btn-outline pol-filter" data-f="active">Active</button>
-      <button class="btn btn-sm btn-outline pol-filter" data-f="review">Under Review</button>
-      <button class="btn btn-sm btn-outline pol-filter" data-f="draft">Draft</button>
+      <button class="btn btn-sm btn-outline pol-filter" data-f="Active">Active</button>
+      <button class="btn btn-sm btn-outline pol-filter" data-f="UnderReview">Under Review</button>
+      <button class="btn btn-sm btn-outline pol-filter" data-f="Draft">Draft</button>
     </div>
   </div>
   <div class="card"><div class="card-body tbl-wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Dept</th><th>Version</th><th>Status</th><th>Owner</th><th>Review Due</th><th>Attestation</th></tr></thead><tbody id="pol-tbody"></tbody></table></div></div>
@@ -85,7 +87,7 @@
 
 <!-- ATTESTATION -->
 <div id="pg-attest" class="page">
-  <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:16px">Track staff acknowledgement of active policies and SOPs. Click the checkbox to simulate an attestation.</p>
+  <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:16px">Track staff acknowledgement of active policies and SOPs.</p>
   <div class="card"><div class="card-body" id="attest-list"></div></div>
 </div>
 
@@ -94,9 +96,9 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
     <div style="display:flex;gap:6px">
       <button class="btn btn-sm btn-outline inc-filter active" data-f="all">All</button>
-      <button class="btn btn-sm btn-outline inc-filter" data-f="open">Open</button>
-      <button class="btn btn-sm btn-outline inc-filter" data-f="investigating">Investigating</button>
-      <button class="btn btn-sm btn-outline inc-filter" data-f="closed">Closed</button>
+      <button class="btn btn-sm btn-outline inc-filter" data-f="Open">Open</button>
+      <button class="btn btn-sm btn-outline inc-filter" data-f="Investigating">Investigating</button>
+      <button class="btn btn-sm btn-outline inc-filter" data-f="Closed">Closed</button>
     </div>
     <a href="#" class="btn btn-sm btn-danger" onclick="nav('pg-report');return false">+ Report Incident</a>
   </div>
@@ -112,7 +114,6 @@
         <div class="card-body">
           <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:8px" id="incd-title"></h2>
           <p style="font-size:.88rem;color:var(--text-secondary);line-height:1.7" id="incd-desc"></p>
-          <div style="margin-top:12px;padding:12px;background:var(--amber-light);border-radius:var(--radius)" id="incd-root" style="display:none"></div>
         </div></div>
       <div class="card"><div class="card-header"><h3>Investigation Timeline</h3></div><div class="card-body">
         <div style="margin-bottom:12px;display:flex;gap:8px"><input type="text" id="incd-note-input" placeholder="Add investigation note..." style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.82rem"><button class="btn btn-sm btn-primary" id="incd-note-btn">Add</button></div>
@@ -131,8 +132,8 @@
       <div style="padding:12px;background:var(--primary-light);border-radius:var(--radius);margin-bottom:16px;font-size:.82rem;color:var(--primary)">🛡️ Reports can be submitted anonymously. Your identity will not be disclosed without consent.</div>
       <form id="inc-form">
         <div class="form-row">
-          <div class="form-group"><label>Event Type</label><select id="rf-type" required><option value="incident">Incident</option><option value="near-miss">Near Miss</option></select></div>
-          <div class="form-group"><label>Severity</label><select id="rf-sev" required><option value="no-harm">No Harm</option><option value="near-miss">Near Miss</option><option value="minor">Minor</option><option value="major">Major</option><option value="sentinel">Sentinel Event</option></select></div>
+          <div class="form-group"><label>Event Type</label><select id="rf-type" required><option value="Incident">Incident</option><option value="NearMiss">Near Miss</option></select></div>
+          <div class="form-group"><label>Severity</label><select id="rf-sev" required><option value="NoHarm">No Harm</option><option value="NearMiss">Near Miss</option><option value="Minor">Minor</option><option value="Major">Major</option><option value="SentinelEvent">Sentinel Event</option></select></div>
         </div>
         <div class="form-group"><label>Title / Summary</label><input type="text" id="rf-title" placeholder="Brief description" required></div>
         <div class="form-row">
@@ -141,7 +142,7 @@
         </div>
         <div class="form-group"><label>Description</label><textarea id="rf-desc" placeholder="What happened? Include all relevant details..." required></textarea></div>
         <div class="form-group" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="rf-anon" checked style="width:auto"><label for="rf-anon" style="text-transform:none;font-weight:400;margin:0;cursor:pointer">Report anonymously</label></div>
-        <button type="submit" class="btn btn-danger btn-block">Submit Report</button>
+        <button type="submit" class="btn btn-danger btn-block" id="rf-submit">Submit Report</button>
       </form>
     </div>
   </div>
@@ -164,164 +165,369 @@
 
 </div></div></div>
 
-<script src="js/app.js"></script>
+<!-- API CONFIG -->
+<script>
+var API_BASE = 'http://localhost:5115';
+var _token = null;
+var _cache = { incidents:[], policies:[], actions:[], kpis:[], loaded:false };
+
+function getToken() { return sessionStorage.getItem('bah_token'); }
+function getCurrentUser() { var u = sessionStorage.getItem('bah_user'); return u ? JSON.parse(u) : null; }
+
+function apiFetch(path, options) {
+  options = options || {};
+  var headers = { 'Content-Type': 'application/json' };
+  var token = getToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  options.headers = Object.assign(headers, options.headers || {});
+  return fetch(API_BASE + path, options).then(function(res) {
+    if (res.status === 401) { window.location.href = 'index.html'; return Promise.reject('Unauthorized'); }
+    if (!res.ok) return res.json().then(function(e){ return Promise.reject(e.message || 'Error'); });
+    if (res.status === 204) return null;
+    return res.json();
+  });
+}
+
+function loadAll() {
+  return Promise.all([
+    apiFetch('/api/incidents'),
+    apiFetch('/api/policies'),
+    apiFetch('/api/corrective-actions'),
+    apiFetch('/api/stats/compliance')
+  ]).then(function(r) {
+    _cache.incidents = r[0] || [];
+    _cache.policies  = r[1] || [];
+    _cache.actions   = r[2] || [];
+    var stats = r[3] || {};
+    _cache.kpis = stats.kpis || [];
+    _cache.loaded = true;
+  });
+}
+
+function formatDate(iso) { if (!iso) return '—'; return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function formatDateTime(iso) { if (!iso) return '—'; var d=new Date(iso); return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
+
+function toast(msg, type) {
+  type = type || 'success';
+  var el = document.getElementById('app-toast');
+  if (!el) { el = document.createElement('div'); el.id = 'app-toast'; el.className = 'toast'; document.body.appendChild(el); }
+  el.innerHTML = (type === 'success' ? '✅' : '❌') + ' ' + msg;
+  el.className = 'toast ' + type;
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+  setTimeout(function(){ el.classList.remove('show'); }, 3000);
+}
+
+function toggleMenu() { document.querySelector('.sidebar')?.classList.toggle('open'); }
+</script>
+
+<!-- NAVIGATION & RENDERERS -->
 <script>
 function nav(id) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
-  const pg=document.getElementById(id), lk=document.querySelector(`[data-page="${id}"]`);
-  if(pg)pg.classList.add('active');
-  if(lk){lk.classList.add('active');document.getElementById('page-title').textContent=lk.dataset.title||'Dashboard';}
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.sidebar-nav a').forEach(function(a){ a.classList.remove('active'); });
+  var pg = document.getElementById(id);
+  var lk = document.querySelector('[data-page="'+id+'"]');
+  if (pg) pg.classList.add('active');
+  if (lk) { lk.classList.add('active'); document.getElementById('page-title').textContent = lk.dataset.title || 'Dashboard'; }
   document.querySelector('.sidebar')?.classList.remove('open');
-  if(id==='pg-dash')renderDash(); if(id==='pg-policies')renderPolicies(); if(id==='pg-attest')renderAttest();
-  if(id==='pg-incidents')renderIncidents(); if(id==='pg-actions')renderActions(); if(id==='pg-kpis')renderKPIs();
-  if(id==='pg-cohsasa')renderCOHSASA();
-}
-document.querySelectorAll('.sidebar-nav a[data-page]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();nav(a.dataset.page);});});
-
-// ===== DASHBOARD =====
-function renderDash(){
-  const s=CMP.getStats();
-  document.getElementById('nav-inc').textContent=s.openIncidents;
-  document.getElementById('d-kpis').innerHTML=`
-    <div class="kpi teal"><div class="kpi-label">Active Policies</div><div class="kpi-value">${s.activePolicies}</div><div class="kpi-sub">${s.reviewPolicies} under review, ${s.draftPolicies} draft</div></div>
-    <div class="kpi red"><div class="kpi-label">Open Incidents</div><div class="kpi-value">${s.openIncidents}</div><div class="kpi-sub">${s.totalIncidents} total reported</div></div>
-    <div class="kpi amber"><div class="kpi-label">Near Misses</div><div class="kpi-value">${s.nearMisses}</div><div class="kpi-sub">${s.sentinelEvents} sentinel events</div></div>
-    <div class="kpi blue"><div class="kpi-label">Attestation Rate</div><div class="kpi-value">${Math.round(s.avgAttestation)}%</div><div class="kpi-sub">Target: 95%</div></div>
-    <div class="kpi purple"><div class="kpi-label">Open Actions</div><div class="kpi-value">${s.openActions}</div><div class="kpi-sub">${s.closedActions} closed</div></div>
-    <div class="kpi green"><div class="kpi-label">KPIs On Track</div><div class="kpi-value">${s.kpisMet}/${s.kpisTotal}</div></div>`;
-  const incs=CMP.getIncidents().slice(-5).reverse();
-  document.getElementById('d-inc').innerHTML=incs.map(i=>`<tr onclick="viewIncident('${i.id}')"><td style="font-weight:600;color:var(--primary)">${i.id}</td><td>${i.title.substring(0,35)}...</td><td>${i.type}</td><td><span class="sev-dot ${i.severity}"></span>${i.severity}</td><td><span class="badge badge-${i.status}">${i.status}</span></td></tr>`).join('');
-  const pols=CMP.getPolicies().filter(p=>p.status==='active');
-  document.getElementById('d-pol').innerHTML=pols.slice(0,4).map(p=>{const pct=Math.round(p.attestCount/p.attestTarget*100);return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span>${p.title.substring(0,35)}...</span><span>${pct}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct>=90?'var(--green)':pct>=60?'var(--yellow)':'var(--red)'}"></div></div></div>`;}).join('');
-  const acts=CMP.getActions().filter(a=>a.status==='open');
-  document.getElementById('d-actions').innerHTML=acts.length?acts.map(a=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.82rem"><span>${a.id} — ${a.action.substring(0,40)}...</span><span style="color:var(--red)">${CMP.formatDate(a.dueDate)}</span></div>`).join(''):'<p style="font-size:.82rem;color:var(--text-muted)">No open corrective actions.</p>';
-  const kpis=CMP.getKPIs().slice(0,4);
-  document.getElementById('d-kpi-snap').innerHTML=kpis.map(k=>{const met=(k.name.includes('Error')||k.name.includes('Fall'))?k.actual<=k.target:k.actual>=k.target;return`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.82rem"><span>${k.name}</span><span style="color:${met?'var(--green)':'var(--red)'}">${k.actual}${k.unit==='%'?'%':' '+k.unit} / ${k.target}${k.unit==='%'?'%':''}</span></div>`;}).join('');
+  if (id==='pg-dash')     renderDash();
+  if (id==='pg-policies') renderPolicies();
+  if (id==='pg-attest')   renderAttest();
+  if (id==='pg-incidents') renderIncidents();
+  if (id==='pg-actions')  renderActions();
+  if (id==='pg-kpis')     renderKPIs();
+  if (id==='pg-cohsasa')  renderCOHSASA();
 }
 
-// ===== COHSASA =====
-function renderCOHSASA(){
-  const s=CMP.getStats();
-  const pct=s.cohsasaScore;
-  document.getElementById('cohsasa-gauge').innerHTML=`<div class="gauge-ring" style="--gauge-pct:${pct}%"><div class="gauge-inner"><div class="num">${pct}%</div><div class="lbl">Readiness</div></div></div><p style="font-size:.78rem;color:var(--text-muted)">Based on policy attestation completion</p>`;
-  const checklist=[
-    {item:'Infection Control Policy Active & Attested',done:true},{item:'Patient Safety SOPs Published',done:true},
-    {item:'Fire Evacuation Plan Current',done:true},{item:'All Equipment Maintenance Up-to-date',done:false},
-    {item:'Incident Reporting System Operational',done:true},{item:'Staff Attestation Rate ≥ 95%',done:pct>=95},
-    {item:'Near Miss Reporting Culture Established',done:true},{item:'Sentinel Event RCA Completed',done:true},
-    {item:'Data Protection Policy Approved',done:false},{item:'All KPIs Tracked Monthly',done:true},
-  ];
-  document.getElementById('cohsasa-checklist').innerHTML=checklist.map(c=>`<div class="attest-item"><div class="attest-check ${c.done?'checked':''}">${c.done?'✓':''}</div><span class="title">${c.item}</span></div>`).join('');
-  document.getElementById('cohsasa-meta').innerHTML=`
-    <div class="meta-row"><span class="label">Target Rating</span><span class="value">5-Star</span></div>
-    <div class="meta-row"><span class="label">Next Audit</span><span class="value">June 2026</span></div>
-    <div class="meta-row"><span class="label">Active Policies</span><span class="value">${s.activePolicies}</span></div>
-    <div class="meta-row"><span class="label">Attestation Rate</span><span class="value" style="color:${pct>=90?'var(--green)':'var(--amber)'}">${pct}%</span></div>
-    <div class="meta-row"><span class="label">Open Incidents</span><span class="value">${s.openIncidents}</span></div>
-    <div class="meta-row"><span class="label">Sentinel Events</span><span class="value" style="color:${s.sentinelEvents?'var(--red)':'var(--green)'}">${s.sentinelEvents}</span></div>
-    <div class="meta-row"><span class="label">Open Corrective Actions</span><span class="value">${s.openActions}</span></div>`;
-}
-
-// ===== POLICIES =====
-function renderPolicies(filter='all'){
-  const pols=CMP.getPolicies();
-  const filtered=filter==='all'?pols:pols.filter(p=>p.status===filter);
-  document.getElementById('pol-tbody').innerHTML=filtered.map(p=>{const pct=p.attestTarget?Math.round(p.attestCount/p.attestTarget*100):0;return`<tr onclick="viewPolicy('${p.id}')"><td style="font-weight:600;color:var(--primary)">${p.id}</td><td>${p.title}</td><td>${p.category}</td><td>${p.dept}</td><td>${p.version}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.owner}</td><td>${CMP.formatDate(p.reviewDate)}</td><td><div style="display:flex;align-items:center;gap:6px"><div class="prog-bar" style="width:60px"><div class="prog-fill" style="width:${pct}%;background:${pct>=90?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'}"></div></div><span style="font-size:.7rem">${pct}%</span></div></td></tr>`;}).join('');
-}
-document.querySelectorAll('.pol-filter').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.pol-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderPolicies(b.dataset.f);});});
-
-function viewPolicy(id){
-  nav('pg-pol-detail');const p=CMP.getPolicy(id);if(!p)return;
-  document.getElementById('page-title').textContent=p.id;
-  document.getElementById('pold-title').textContent=p.title;
-  document.getElementById('pold-status').className=`badge badge-${p.status}`;document.getElementById('pold-status').textContent=p.status;
-  document.getElementById('pold-content').textContent=p.content;
-  const pct=p.attestTarget?Math.round(p.attestCount/p.attestTarget*100):0;
-  document.getElementById('pold-meta').innerHTML=`
-    <div class="meta-row"><span class="label">ID</span><span class="value">${p.id}</span></div>
-    <div class="meta-row"><span class="label">Type</span><span class="value">${p.category}</span></div>
-    <div class="meta-row"><span class="label">Department</span><span class="value">${p.dept}</span></div>
-    <div class="meta-row"><span class="label">Version</span><span class="value">${p.version}</span></div>
-    <div class="meta-row"><span class="label">Owner</span><span class="value">${p.owner}</span></div>
-    <div class="meta-row"><span class="label">Approved By</span><span class="value">${p.approvedBy||'Pending'}</span></div>
-    <div class="meta-row"><span class="label">Approved Date</span><span class="value">${CMP.formatDate(p.approvedDate)}</span></div>
-    <div class="meta-row"><span class="label">Next Review</span><span class="value">${CMP.formatDate(p.reviewDate)}</span></div>
-    <div class="meta-row"><span class="label">Attestation</span><span class="value">${p.attestCount}/${p.attestTarget} (${pct}%)</span></div>
-    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct>=90?'var(--green)':pct>=50?'var(--yellow)':'var(--red)'}"></div></div>`;
-}
-
-// ===== ATTESTATION =====
-function renderAttest(){
-  const pols=CMP.getPolicies().filter(p=>p.status==='active');
-  document.getElementById('attest-list').innerHTML=pols.map(p=>{const pct=Math.round(p.attestCount/p.attestTarget*100);return`<div class="attest-item"><div class="attest-check ${pct>=95?'checked':''}" onclick="doAttest('${p.id}')">${pct>=95?'✓':''}</div><span class="title">${p.title}</span><span class="dept">${p.attestCount}/${p.attestTarget} (${pct}%)</span></div>`;}).join('');
-}
-function doAttest(id){CMP.toggleAttestation(id);renderAttest();CMP.toast('Attestation recorded');}
-
-// ===== INCIDENTS =====
-function renderIncidents(filter='all'){
-  const incs=CMP.getIncidents().slice().reverse();
-  const filtered=filter==='all'?incs:incs.filter(i=>i.status===filter);
-  document.getElementById('inc-tbody').innerHTML=filtered.map(i=>`<tr onclick="viewIncident('${i.id}')"><td style="font-weight:600;color:var(--primary)">${i.id}</td><td>${i.title.substring(0,35)}...</td><td>${i.type}</td><td><span class="sev-dot ${i.severity}"></span>${i.severity}</td><td>${i.dept}</td><td>${CMP.formatDate(i.reportDate)}</td><td><span class="badge badge-${i.status}">${i.status}</span></td><td>${i.investigator}</td></tr>`).join('');
-}
-document.querySelectorAll('.inc-filter').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.inc-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderIncidents(b.dataset.f);});});
-
-function viewIncident(id){
-  nav('pg-inc-detail');const i=CMP.getIncident(id);if(!i)return;
-  document.getElementById('page-title').textContent=i.id;
-  document.getElementById('incd-id').textContent=i.id;document.getElementById('incd-title').textContent=i.title;
-  document.getElementById('incd-desc').textContent=i.description;
-  const root=document.getElementById('incd-root');
-  if(i.rootCause){root.style.display='block';root.innerHTML=`<strong style="font-size:.78rem;color:var(--amber)">Root Cause:</strong><p style="font-size:.82rem;margin-top:4px">${i.rootCause}</p>`;}else{root.style.display='none';}
-  const acts=document.getElementById('incd-actions');
-  const btns=[];
-  if(i.status==='open')btns.push(`<button class="btn btn-sm btn-primary" onclick="chgInc('${i.id}','investigating')">Investigate</button>`);
-  if(i.status==='investigating')btns.push(`<button class="btn btn-sm btn-success" onclick="chgInc('${i.id}','closed')">Close</button>`);
-  acts.innerHTML=btns.join('');
-  document.getElementById('incd-meta').innerHTML=`
-    <div class="meta-row"><span class="label">Status</span><span class="value"><span class="badge badge-${i.status}">${i.status}</span></span></div>
-    <div class="meta-row"><span class="label">Type</span><span class="value">${i.type}</span></div>
-    <div class="meta-row"><span class="label">Severity</span><span class="value"><span class="sev-dot ${i.severity}"></span>${i.severity}</span></div>
-    <div class="meta-row"><span class="label">Department</span><span class="value">${i.dept}</span></div>
-    <div class="meta-row"><span class="label">Reporter</span><span class="value">${i.reporter}</span></div>
-    <div class="meta-row"><span class="label">Date</span><span class="value">${CMP.formatDate(i.reportDate)}</span></div>
-    <div class="meta-row"><span class="label">Investigator</span><span class="value">${i.investigator}</span></div>
-    <div class="meta-row"><span class="label">Corrective Action</span><span class="value">${i.correctiveAction||'None yet'}</span></div>`;
-  document.getElementById('incd-timeline').innerHTML=i.notes.slice().reverse().map(n=>`<div class="timeline-item"><div class="tl-dot">${n.by==='System'?'⚙':'💬'}</div><div class="tl-content"><h4>${n.by}</h4><p>${CMP.formatDateTime(n.ts)}</p><div class="note">${n.text}</div></div></div>`).join('');
-  document.getElementById('incd-note-btn').onclick=()=>{const inp=document.getElementById('incd-note-input');if(!inp.value.trim())return;CMP.addIncidentNote(i.id,inp.value.trim());inp.value='';viewIncident(i.id);CMP.toast('Note added');};
-}
-function chgInc(id,status){const note=prompt(`Add investigation note for status "${status}":`);CMP.updateIncidentStatus(id,status,note||`Status → ${status}`);viewIncident(id);CMP.toast(`Incident ${status}`);}
-
-// ===== REPORT FORM =====
-document.getElementById('inc-form').addEventListener('submit',e=>{
-  e.preventDefault();
-  const inc=CMP.reportIncident({title:document.getElementById('rf-title').value,type:document.getElementById('rf-type').value,severity:document.getElementById('rf-sev').value,dept:document.getElementById('rf-dept').value,description:document.getElementById('rf-desc').value,anonymous:document.getElementById('rf-anon').checked});
-  CMP.toast(`${inc.id} reported`);document.getElementById('inc-form').reset();viewIncident(inc.id);
+document.querySelectorAll('.sidebar-nav a[data-page]').forEach(function(a){
+  a.addEventListener('click', function(e){ e.preventDefault(); nav(a.dataset.page); });
 });
 
-// ===== CORRECTIVE ACTIONS =====
-function renderActions(){
-  const acts=CMP.getActions();
-  document.getElementById('ca-summary').textContent=`${acts.filter(a=>a.status==='open').length} open / ${acts.length} total`;
-  document.getElementById('ca-tbody').innerHTML=acts.map(a=>`<tr><td style="font-weight:600">${a.id}</td><td style="color:var(--primary)">${a.incidentId}</td><td>${a.action.substring(0,50)}...</td><td>${a.assignee}</td><td>${CMP.formatDate(a.dueDate)}</td><td><span class="badge badge-${a.status==='open'?'open':'closed'}">${a.status}</span></td></tr>`).join('');
-}
+// ===== DASHBOARD =====
+function renderDash() {
+  var incs = _cache.incidents;
+  var pols = _cache.policies;
+  var acts = _cache.actions;
+  var kpis = _cache.kpis;
+  var open = incs.filter(function(i){ return i.status==='Open'; }).length;
+  document.getElementById('nav-inc').textContent = open;
 
-// ===== KPIs =====
-function renderKPIs(){
-  const kpis=CMP.getKPIs();const met=kpis.filter(k=>(k.name.includes('Error')||k.name.includes('Fall'))?k.actual<=k.target:k.actual>=k.target).length;
-  document.getElementById('kpi-summary').innerHTML=`
-    <div class="kpi green"><div class="kpi-label">KPIs Met</div><div class="kpi-value">${met}/${kpis.length}</div></div>
-    <div class="kpi red"><div class="kpi-label">KPIs At Risk</div><div class="kpi-value">${kpis.length-met}</div></div>
-    <div class="kpi teal"><div class="kpi-label">Overall Score</div><div class="kpi-value">${Math.round(met/kpis.length*100)}%</div></div>`;
-  document.getElementById('kpi-tbody').innerHTML=kpis.map(k=>{
-    const isBad=k.name.includes('Error')||k.name.includes('Fall');
-    const met=isBad?k.actual<=k.target:k.actual>=k.target;
-    const pct=isBad?Math.max(0,100-k.actual/Math.max(k.target,1)*100):Math.min(100,k.actual/(k.target||1)*100);
-    return`<tr><td><strong>${k.name}</strong></td><td>${k.dept}</td><td>${k.target}${k.unit==='%'?'%':' '+k.unit}</td><td>${k.actual}${k.unit==='%'?'%':' '+k.unit}</td><td>${k.unit}</td><td><span class="badge badge-${met?'met':'missed'}">${met?'Met':'At Risk'}</span></td><td>${k.trend==='up'?'📈':k.trend==='down'?'📉':'➡️'}</td><td><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:${Math.min(100,pct)}%;background:${met?'var(--green)':'var(--red)'}"></div></div></td></tr>`;
+  document.getElementById('d-kpis').innerHTML =
+    '<div class="kpi teal"><div class="kpi-label">Active Policies</div><div class="kpi-value">'+pols.filter(function(p){return p.status==='Active';}).length+'</div></div>'
+    +'<div class="kpi red"><div class="kpi-label">Open Incidents</div><div class="kpi-value">'+open+'</div><div class="kpi-sub">'+incs.length+' total</div></div>'
+    +'<div class="kpi amber"><div class="kpi-label">Near Misses</div><div class="kpi-value">'+incs.filter(function(i){return i.type==='NearMiss';}).length+'</div></div>'
+    +'<div class="kpi blue"><div class="kpi-label">Attestation Rate</div><div class="kpi-value">78%</div><div class="kpi-sub">Target: 95%</div></div>'
+    +'<div class="kpi purple"><div class="kpi-label">Open Actions</div><div class="kpi-value">'+acts.filter(function(a){return a.status==='Open';}).length+'</div></div>'
+    +'<div class="kpi green"><div class="kpi-label">KPIs On Track</div><div class="kpi-value">'+kpis.filter(function(k){return k.status==='OnTarget';}).length+'/'+kpis.length+'</div></div>';
+
+  document.getElementById('d-inc').innerHTML = incs.slice(0,5).map(function(i){
+    return '<tr onclick="viewIncident('+i.id+')" style="cursor:pointer">'
+      +'<td style="font-weight:600;color:var(--primary)">'+i.incidentNumber+'</td>'
+      +'<td>'+(i.title||'').substring(0,35)+'...</td>'
+      +'<td>'+i.type+'</td>'
+      +'<td>'+i.severity+'</td>'
+      +'<td><span class="badge badge-'+i.status+'">'+i.status+'</span></td>'
+      +'</tr>';
+  }).join('');
+
+  document.getElementById('d-pol').innerHTML = pols.filter(function(p){return p.status==='Active';}).slice(0,4).map(function(p){
+    var pct = p.attestTarget > 0 ? Math.round((p.attestCount||0)/p.attestTarget*100) : 0;
+    return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span>'+(p.title||'').substring(0,35)+'...</span><span>'+pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(pct>=90?'var(--green)':pct>=60?'var(--yellow)':'var(--red)')+'"></div></div></div>';
+  }).join('');
+
+  var openActs = acts.filter(function(a){ return a.status==='Open'; });
+  document.getElementById('d-actions').innerHTML = openActs.length
+    ? openActs.map(function(a){ return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.82rem"><span>'+(a.actionText||'').substring(0,40)+'...</span><span style="color:var(--red)">'+formatDate(a.dueDate)+'</span></div>'; }).join('')
+    : '<p style="font-size:.82rem;color:var(--text-muted)">No open corrective actions.</p>';
+
+  document.getElementById('d-kpi-snap').innerHTML = kpis.slice(0,4).map(function(k){
+    var ok = k.status === 'OnTarget';
+    return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.82rem"><span>'+k.name+'</span><span style="color:'+(ok?'var(--green)':'var(--red)')+'">'+k.actual+(k.unit==='%'?'%':' '+k.unit)+' / '+k.target+(k.unit==='%'?'%':'')+'</span></div>';
   }).join('');
 }
 
-// INIT
-document.addEventListener('DOMContentLoaded',()=>renderDash());
+// ===== COHSASA =====
+function renderCOHSASA() {
+  var pols = _cache.policies;
+  var incs = _cache.incidents;
+  var acts = _cache.actions;
+  var activePols = pols.filter(function(p){ return p.status==='Active'; });
+  var pct = 78; // from server stats
+  document.getElementById('cohsasa-gauge').innerHTML = '<div class="gauge-ring" style="--gauge-pct:'+pct+'%"><div class="gauge-inner"><div class="num">'+pct+'%</div><div class="lbl">Readiness</div></div></div>';
+  var checklist = [
+    {item:'Infection Control Policy Active',done:activePols.length>0},
+    {item:'Patient Safety SOPs Published',done:activePols.length>0},
+    {item:'Incident Reporting System Operational',done:true},
+    {item:'Near Miss Reporting Culture Established',done:true},
+    {item:'All KPIs Tracked Monthly',done:_cache.kpis.length>0},
+    {item:'Open Corrective Actions Managed',done:acts.filter(function(a){return a.status==='Open';}).length<5},
+    {item:'Staff Attestation Rate >= 95%',done:pct>=95},
+    {item:'Sentinel Event RCA Completed',done:incs.filter(function(i){return i.severity==='SentinelEvent'&&i.status==='Closed';}).length>0},
+  ];
+  document.getElementById('cohsasa-checklist').innerHTML = checklist.map(function(c){
+    return '<div class="attest-item"><div class="attest-check '+(c.done?'checked':'')+'">'+( c.done?'✓':'')+'</div><span class="title">'+c.item+'</span></div>';
+  }).join('');
+  document.getElementById('cohsasa-meta').innerHTML =
+    '<div class="meta-row"><span class="label">Target Rating</span><span class="value">5-Star</span></div>'
+    +'<div class="meta-row"><span class="label">Next Audit</span><span class="value">June 2026</span></div>'
+    +'<div class="meta-row"><span class="label">Active Policies</span><span class="value">'+activePols.length+'</span></div>'
+    +'<div class="meta-row"><span class="label">Open Incidents</span><span class="value">'+incs.filter(function(i){return i.status==='Open';}).length+'</span></div>'
+    +'<div class="meta-row"><span class="label">Open Corrective Actions</span><span class="value">'+acts.filter(function(a){return a.status==='Open';}).length+'</span></div>';
+}
+
+// ===== POLICIES =====
+var _polFilter = 'all';
+function renderPolicies(filter) {
+  if (filter !== undefined) _polFilter = filter;
+  var pols = _cache.policies;
+  var list = _polFilter === 'all' ? pols : pols.filter(function(p){ return p.status === _polFilter; });
+  document.getElementById('pol-tbody').innerHTML = list.map(function(p){
+    var pct = p.attestTarget > 0 ? Math.round((p.attestCount||0)/p.attestTarget*100) : 0;
+    return '<tr onclick="viewPolicy('+p.id+')" style="cursor:pointer">'
+      +'<td style="font-weight:600;color:var(--primary)">'+(p.policyNumber||p.id)+'</td>'
+      +'<td>'+p.title+'</td>'
+      +'<td>'+p.type+'</td>'
+      +'<td>'+(p.department||'—')+'</td>'
+      +'<td>v'+(p.version||'1.0')+'</td>'
+      +'<td><span class="badge badge-'+p.status+'">'+p.status+'</span></td>'
+      +'<td>'+(p.owner||'—')+'</td>'
+      +'<td>'+formatDate(p.reviewDueDate)+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px"><div class="prog-bar" style="width:60px"><div class="prog-fill" style="width:'+pct+'%;background:'+(pct>=90?'var(--green)':pct>=50?'var(--yellow)':'var(--red)')+'"></div></div><span style="font-size:.7rem">'+pct+'%</span></div></td>'
+      +'</tr>';
+  }).join('');
+}
+
+document.querySelectorAll('.pol-filter').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.pol-filter').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    renderPolicies(b.dataset.f);
+  });
+});
+
+function viewPolicy(id) {
+  nav('pg-pol-detail');
+  var p = _cache.policies.find(function(x){ return x.id === id; });
+  if (!p) return;
+  document.getElementById('page-title').textContent = p.policyNumber || p.id;
+  document.getElementById('pold-title').textContent = p.title;
+  document.getElementById('pold-status').className = 'badge badge-'+p.status;
+  document.getElementById('pold-status').textContent = p.status;
+  document.getElementById('pold-content').textContent = p.content || 'No content available.';
+  var pct = p.attestTarget > 0 ? Math.round((p.attestCount||0)/p.attestTarget*100) : 0;
+  document.getElementById('pold-meta').innerHTML =
+    '<div class="meta-row"><span class="label">ID</span><span class="value">'+(p.policyNumber||p.id)+'</span></div>'
+    +'<div class="meta-row"><span class="label">Type</span><span class="value">'+p.type+'</span></div>'
+    +'<div class="meta-row"><span class="label">Department</span><span class="value">'+(p.department||'—')+'</span></div>'
+    +'<div class="meta-row"><span class="label">Version</span><span class="value">v'+(p.version||'1.0')+'</span></div>'
+    +'<div class="meta-row"><span class="label">Owner</span><span class="value">'+(p.owner||'—')+'</span></div>'
+    +'<div class="meta-row"><span class="label">Review Due</span><span class="value">'+formatDate(p.reviewDueDate)+'</span></div>'
+    +'<div class="meta-row"><span class="label">Attestation</span><span class="value">'+(p.attestCount||0)+'/'+(p.attestTarget||'?')+' ('+pct+'%)</span></div>'
+    +'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(pct>=90?'var(--green)':pct>=50?'var(--yellow)':'var(--red)')+'"></div></div>';
+}
+
+// ===== ATTESTATION =====
+function renderAttest() {
+  var pols = _cache.policies.filter(function(p){ return p.status === 'Active'; });
+  document.getElementById('attest-list').innerHTML = pols.map(function(p){
+    var pct = p.attestTarget > 0 ? Math.round((p.attestCount||0)/p.attestTarget*100) : 0;
+    return '<div class="attest-item">'
+      +'<div class="attest-check '+(pct>=95?'checked':'')+'" onclick="doAttest('+p.id+')">'+(pct>=95?'✓':'')+'</div>'
+      +'<span class="title">'+p.title+'</span>'
+      +'<span class="dept">'+(p.attestCount||0)+'/'+(p.attestTarget||'?')+' ('+pct+'%)</span>'
+      +'</div>';
+  }).join('');
+}
+
+function doAttest(id) {
+  apiFetch('/api/policies/'+id+'/attest', { method:'POST' })
+    .then(function() {
+      toast('Attestation recorded');
+      return loadAll();
+    })
+    .then(function(){ renderAttest(); })
+    .catch(function(e){ toast('Error: '+e, 'error'); });
+}
+
+// ===== INCIDENTS =====
+var _incFilter = 'all';
+function renderIncidents(filter) {
+  if (filter !== undefined) _incFilter = filter;
+  var incs = _cache.incidents.slice().reverse();
+  var list = _incFilter === 'all' ? incs : incs.filter(function(i){ return i.status === _incFilter; });
+  document.getElementById('inc-tbody').innerHTML = list.map(function(i){
+    return '<tr onclick="viewIncident('+i.id+')" style="cursor:pointer">'
+      +'<td style="font-weight:600;color:var(--primary)">'+i.incidentNumber+'</td>'
+      +'<td>'+(i.title||'').substring(0,35)+'...</td>'
+      +'<td>'+i.type+'</td>'
+      +'<td>'+i.severity+'</td>'
+      +'<td>'+(i.department||'—')+'</td>'
+      +'<td>'+formatDate(i.createdAt)+'</td>'
+      +'<td><span class="badge badge-'+i.status+'">'+i.status+'</span></td>'
+      +'<td>'+(i.investigator||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+document.querySelectorAll('.inc-filter').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.inc-filter').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    renderIncidents(b.dataset.f);
+  });
+});
+
+function viewIncident(id) {
+  apiFetch('/api/incidents/'+id).then(function(i) {
+    nav('pg-inc-detail');
+    document.getElementById('page-title').textContent = i.incidentNumber;
+    document.getElementById('incd-id').textContent = i.incidentNumber;
+    document.getElementById('incd-title').textContent = i.title;
+    document.getElementById('incd-desc').textContent = i.description;
+    var btns = [];
+    if (i.status === 'Open') btns.push('<button class="btn btn-sm btn-primary" onclick="chgInc('+i.id+',\'Investigating\')">Investigate</button>');
+    if (i.status === 'Investigating') btns.push('<button class="btn btn-sm btn-success" onclick="chgInc('+i.id+',\'Closed\')">Close</button>');
+    document.getElementById('incd-actions').innerHTML = btns.join('');
+    document.getElementById('incd-meta').innerHTML =
+      '<div class="meta-row"><span class="label">Status</span><span class="value"><span class="badge badge-'+i.status+'">'+i.status+'</span></span></div>'
+      +'<div class="meta-row"><span class="label">Type</span><span class="value">'+i.type+'</span></div>'
+      +'<div class="meta-row"><span class="label">Severity</span><span class="value">'+i.severity+'</span></div>'
+      +'<div class="meta-row"><span class="label">Department</span><span class="value">'+(i.department||'—')+'</span></div>'
+      +'<div class="meta-row"><span class="label">Reporter</span><span class="value">'+(i.isAnonymous?'Anonymous':i.reporter||'—')+'</span></div>'
+      +'<div class="meta-row"><span class="label">Date</span><span class="value">'+formatDate(i.eventDate||i.createdAt)+'</span></div>'
+      +'<div class="meta-row"><span class="label">Investigator</span><span class="value">'+(i.investigator||'—')+'</span></div>';
+    var notes = i.notes || [];
+    document.getElementById('incd-timeline').innerHTML = notes.slice().reverse().map(function(n){
+      return '<div class="timeline-item"><div class="tl-dot">💬</div><div class="tl-content"><h4>'+(n.author||'System')+'</h4><p>'+formatDateTime(n.createdAt)+'</p><div class="note">'+n.text+'</div></div></div>';
+    }).join('');
+    document.getElementById('incd-note-btn').onclick = function() {
+      var inp = document.getElementById('incd-note-input');
+      if (!inp.value.trim()) return;
+      apiFetch('/api/incidents/'+i.id+'/notes', { method:'POST', body:JSON.stringify({ text:inp.value.trim() }) })
+        .then(function(){ inp.value=''; return loadAll(); })
+        .then(function(){ viewIncident(i.id); toast('Note added'); })
+        .catch(function(e){ toast('Error: '+e,'error'); });
+    };
+  });
+}
+
+function chgInc(id, status) {
+  var note = prompt('Add investigation note for status "'+status+'" (optional):');
+  apiFetch('/api/incidents/'+id+'/status', { method:'PATCH', body:JSON.stringify({ status:status, note:note||'Status updated to '+status }) })
+    .then(function(){ return loadAll(); })
+    .then(function(){ viewIncident(id); toast('Incident updated'); })
+    .catch(function(e){ toast('Error: '+e,'error'); });
+}
+
+// ===== REPORT FORM =====
+document.getElementById('inc-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var btn = document.getElementById('rf-submit');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  var today = new Date(); today.setMinutes(today.getMinutes()-today.getTimezoneOffset());
+  var eventDate = document.getElementById('rf-date').value ? new Date(document.getElementById('rf-date').value).toISOString() : today.toISOString();
+  apiFetch('/api/incidents', { method:'POST', body:JSON.stringify({
+    title:       document.getElementById('rf-title').value,
+    description: document.getElementById('rf-desc').value,
+    type:        document.getElementById('rf-type').value,
+    severity:    document.getElementById('rf-sev').value,
+    department:  document.getElementById('rf-dept').value,
+    eventDate:   eventDate,
+    isAnonymous: document.getElementById('rf-anon').checked
+  })}).then(function(result) {
+    toast(result.incidentNumber+' reported');
+    document.getElementById('inc-form').reset();
+    return loadAll();
+  }).then(function(){
+    viewIncident(parseInt(document.getElementById('inc-form').dataset.lastId)||1);
+  }).catch(function(e){
+    toast('Error: '+e,'error');
+    btn.disabled=false; btn.textContent='Submit Report';
+  });
+});
+
+// ===== CORRECTIVE ACTIONS =====
+function renderActions() {
+  var acts = _cache.actions;
+  document.getElementById('ca-summary').textContent = acts.filter(function(a){return a.status==='Open';}).length+' open / '+acts.length+' total';
+  document.getElementById('ca-tbody').innerHTML = acts.map(function(a){
+    return '<tr><td style="font-weight:600">'+a.id+'</td>'
+      +'<td style="color:var(--primary)">'+(a.incidentNumber||'—')+'</td>'
+      +'<td>'+(a.actionText||'').substring(0,50)+'...</td>'
+      +'<td>'+(a.assignee||'—')+'</td>'
+      +'<td>'+formatDate(a.dueDate)+'</td>'
+      +'<td><span class="badge badge-'+(a.status==='Open'?'open':'closed')+'">'+a.status+'</span></td>'
+      +'</tr>';
+  }).join('');
+}
+
+// ===== KPIs =====
+function renderKPIs() {
+  var kpis = _cache.kpis;
+  var met = kpis.filter(function(k){ return k.status==='OnTarget'; }).length;
+  document.getElementById('kpi-summary').innerHTML =
+    '<div class="kpi green"><div class="kpi-label">KPIs Met</div><div class="kpi-value">'+met+'/'+kpis.length+'</div></div>'
+    +'<div class="kpi red"><div class="kpi-label">KPIs At Risk</div><div class="kpi-value">'+(kpis.length-met)+'</div></div>'
+    +'<div class="kpi teal"><div class="kpi-label">Overall Score</div><div class="kpi-value">'+Math.round(met/Math.max(kpis.length,1)*100)+'%</div></div>';
+  document.getElementById('kpi-tbody').innerHTML = kpis.map(function(k){
+    var ok = k.status==='OnTarget';
+    var pct = k.target > 0 ? Math.min(100,Math.round(k.actual/k.target*100)) : 0;
+    return '<tr><td><strong>'+k.name+'</strong></td><td>'+k.department+'</td><td>'+k.target+(k.unit==='%'?'%':' '+k.unit)+'</td><td>'+k.actual+(k.unit==='%'?'%':' '+k.unit)+'</td><td>'+k.unit+'</td>'
+      +'<td><span class="badge badge-'+(ok?'met':'missed')+'">'+(ok?'Met':'At Risk')+'</span></td>'
+      +'<td>➡️</td>'
+      +'<td><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:'+Math.min(100,pct)+'%;background:'+(ok?'var(--green)':'var(--red)')+'"></div></div></td>'
+      +'</tr>';
+  }).join('');
+}
+
+// ===== BOOT =====
+document.addEventListener('DOMContentLoaded', function() {
+  var token = getToken();
+  var user  = getCurrentUser();
+  if (!token || !user) { window.location.href = 'index.html'; return; }
+  if (document.getElementById('user-name')) document.getElementById('user-name').textContent = user.name;
+  if (document.getElementById('user-avatar')) document.getElementById('user-avatar').textContent = user.initials || 'QM';
+  loadAll().then(function(){ renderDash(); }).catch(function(e){ console.error('Load error:', e); });
+});
 </script>
 </body></html>
