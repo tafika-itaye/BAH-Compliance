@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAH Compliance — Sign In</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f3f3f3;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:32px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.logo-box{width:40px;height:40px;background:#0067c0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0}
+.logo-text h1{font-size:15px;font-weight:700;color:#1a1a1a}
+.logo-text p{font-size:11px;color:#666;margin-top:1px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:5px}
+.form-control{width:100%;background:#fff;border:1px solid #d0d0d0;border-radius:4px;padding:8px 12px;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-control:focus{border-color:#0067c0;box-shadow:0 0 0 2px rgba(0,103,192,.15)}
+.btn-primary{width:100%;background:#0067c0;color:#fff;border:none;border-radius:4px;padding:9px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s;margin-top:4px}
+.btn-primary:hover{background:#005ba4}
+.btn-primary:disabled{background:#a0b8d0;cursor:not-allowed}
+.error-msg{background:#fde7e9;border:1px solid #f4aaaa;border-radius:4px;padding:8px 12px;font-size:12px;color:#c42b1c;margin-bottom:14px;display:none}
+.footer-text{text-align:center;font-size:11px;color:#999;margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="logo-row">
+    <div class="logo-box">BAH</div>
+    <div class="logo-text">
+      <h1>Compliance System</h1>
+      <p>Blantyre Adventist Hospital</p>
+    </div>
+  </div>
+
+  <div class="error-msg" id="err-msg">Invalid email or password.</div>
+
+  <div class="form-group">
+    <label class="form-label">Email Address</label>
+    <input type="email" class="form-control" id="inp-email" placeholder="your@bah.mw" autocomplete="email">
+  </div>
+  <div class="form-group">
+    <label class="form-label">Password</label>
+    <input type="password" class="form-control" id="inp-password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+
+  <button class="btn-primary" id="btn-login">Sign In</button>
+
+  <div class="footer-text">TechNexus MW &copy; 2026 &mdash; BAH Compliance v2.0</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// Redirect if already logged in
+if (getToken() && getUser()) {
+  window.location.href = 'dashboard.html';
+}
+
+document.getElementById('btn-login').addEventListener('click', doLogin);
+document.getElementById('inp-password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+function doLogin() {
+  var email    = document.getElementById('inp-email').value.trim();
+  var password = document.getElementById('inp-password').value;
+  var btn      = document.getElementById('btn-login');
+  var err      = document.getElementById('err-msg');
+
+  if (!email || !password) { showErr('Please enter your email and password.'); return; }
+
+  btn.disabled    = true;
+  btn.textContent = 'Signing in...';
+  err.style.display = 'none';
+
+  login(email, password)
+    .then(function() {
+      window.location.href = 'dashboard.html';
+    })
+    .catch(function(e) {
+      showErr(e || 'Invalid email or password.');
+      btn.disabled    = false;
+      btn.textContent = 'Sign In';
+    });
+}
+
+function showErr(msg) {
+  var el = document.getElementById('err-msg');
+  el.textContent    = msg;
+  el.style.display  = 'block';
+}
+</script>
+</body>
+</html>

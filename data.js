@@ -1,99 +1,236 @@
-// ===== BAH COMPLIANCE — SHARED DATA =====
+// ===== BAH COMPLIANCE — API DATA LAYER =====
+// Replaces localStorage with ASP.NET Core API calls
+// Drop-in replacement: same function signatures, async init
 
-var USER_KEY     = 'bah_user';
-var TICKETS_KEY  = 'bah_incidents';
-var POLICIES_KEY = 'bah_policies';
-var SOPS_KEY     = 'bah_sops';
-var ACTIONS_KEY  = 'bah_actions';
-var ATTEST_KEY   = 'bah_attestations';
+var API_BASE = 'http://localhost:5115'; // change to production URL on deployment
 
-var DEMO_USERS = {
-  'quality@bah.mw':  { name:'Quality Officer Banda', initials:'QB', role:'quality',  dept:'Quality & Safety', title:'COHSASA Lead',            password:'password' },
-  'nurse@bah.mw':    { name:'Nurse Phiri',            initials:'NP', role:'staff',    dept:'Ward 3 — Nursing', title:'Registered Nurse',         password:'password' },
-  'ceo@bah.mw':      { name:'CEO Mwale',              initials:'CM', role:'ceo',      dept:'Executive',        title:'Chief Executive Officer',  password:'password' },
-  'doctor@bah.mw':   { name:'Dr. Chirwa',             initials:'DC', role:'staff',    dept:'OPD',              title:'General Practitioner',     password:'password' },
-  'admin@bah.mw':    { name:'System Administrator',   initials:'SA', role:'admin',    dept:'System',           title:'System Administrator',     password:'password' },
-};
-
-var DEFAULT_INCIDENTS = [
-  { id:'INC-0041', desc:'Medication — wrong dosage administered (caught by nurse)', type:'Near Miss',  severity:'Near Miss',    dept:'OPD',       reported:'2026-03-17', reporter:'Anonymous',        investigator:'Quality Officer Banda', status:'Investigating', what:'During medication preparation for Ward 3, a dosage of 500mg was drawn up instead of the prescribed 250mg. The error was identified by the supervising nurse before administration. Patient was not affected.', factors:'Similar vial labelling between 250mg and 500mg concentration. High workload at time of incident.', action:'Correct dose administered. Incident reported to ward supervisor. Vials segregated and flagged for pharmacy review.', step:3 },
-  { id:'INC-0040', desc:'Slip and fall — patient in corridor, no injury',            type:'Incident',   severity:'No Harm',      dept:'Ward 2',    reported:'2026-03-16', reporter:'Staff',            investigator:'Quality Officer Banda', status:'Action Plan',   what:'Patient slipped in the main corridor near Ward 2. No injury was sustained. Wet floor from recent mopping was not signed.', factors:'Absent wet floor signage. High foot traffic area.', action:'Immediate wet floor sign placed. Patient assessed and cleared.', step:4 },
-  { id:'INC-0039', desc:'Equipment — infusion pump alarm not heard by staff',        type:'Near Miss',  severity:'Near Miss',    dept:'Ward 3',    reported:'2026-03-15', reporter:'Anonymous',        investigator:'Quality Officer Banda', status:'Closed',        what:'Infusion pump alarm triggered but was not heard by nursing staff for approximately 8 minutes due to ambient noise levels.', factors:'High ambient noise. Alarm volume settings at minimum.', action:'Alarm volume increased. Noise audit conducted.', step:5 },
-  { id:'INC-0038', desc:'Specimen mislabelling — caught at lab before processing',   type:'Near Miss',  severity:'No Harm',      dept:'Laboratory',reported:'2026-03-14', reporter:'Staff',            investigator:'Lab Manager',           status:'Closed',        what:'Two blood specimens were swapped during labelling. Identified during pre-analytical checks at the lab before processing.', factors:'Busy ward round. Distraction during labelling process.', action:'Re-labelling protocol reinforced. Double-check procedure implemented.', step:5 },
-  { id:'INC-0037', desc:'Patient fall in bathroom — minor bruise',                   type:'Incident',   severity:'Adverse Event',dept:'Ward 1',    reported:'2026-03-12', reporter:'Staff',            investigator:'Quality Officer Banda', status:'Closed',        what:'Elderly patient fell in bathroom. Sustained minor bruise to left forearm. Incident reported immediately.', factors:'Absence of grab bars near toilet. Patient not assessed for fall risk on admission.', action:'Patient treated. Fall risk reassessment done. Maintenance requested for grab bars.', step:5 },
-  { id:'INC-0036', desc:'Unlocked medication cabinet found during rounds',            type:'Near Miss',  severity:'No Harm',      dept:'Pharmacy',  reported:'2026-03-10', reporter:'Staff',            investigator:'Pharmacy Lead',         status:'Closed',        what:'During routine rounds medication cabinet found unlocked and unattended for an estimated 15 minutes.', factors:'Staff distracted by urgent patient call.', action:'Cabinet locked and audited. Reminder issued to pharmacy team.', step:5 },
-  { id:'INC-0035', desc:'Equipment — defibrillator battery low, found during check', type:'Incident',   severity:'No Harm',      dept:'Emergency', reported:'2026-03-10', reporter:'Staff',            investigator:'Biomedical',            status:'Closed',        what:'Defibrillator unit found with low battery during weekly equipment check. Unit was not used on any patient.', factors:'Battery replacement schedule not being followed consistently.', action:'Battery replaced. Schedule updated.', step:5 },
-  { id:'INC-0034', desc:'Documentation — incomplete surgical checklist submitted',   type:'Near Miss',  severity:'No Harm',      dept:'Theatre',   reported:'2026-03-07', reporter:'Staff',            investigator:'Theatre Lead',          status:'Action Plan',   what:'Post-operative surgical checklist submitted with 3 of 20 items unchecked. No adverse outcomes occurred.', factors:'Rush to complete before next case. Checklist design not intuitive.', action:'Team briefed. Checklist revised and re-printed. Training scheduled.', step:4 },
-];
-
-var DEFAULT_POLICIES = [
-  { id:'POL-001', title:'Infection Control Policy',         category:'Clinical',   version:'v4.2', updated:'2026-03-14', attested:34,  total:112, reviewDue:'Sep 2026', status:'Pending Approval', cohsasa:'IPC-001', owner:'Quality Officer Banda', cycle:'Annual',  content:'1. Purpose\n\nThis policy establishes the standards and procedures for infection prevention and control at Blantyre Adventist Hospital, in alignment with COHSASA standards and WHO guidelines.\n\n2. Scope\n\nApplies to all clinical staff, support staff, and visitors. All clinical departments are required to comply with the hand hygiene, PPE, and waste management sections.\n\n3. Key Requirements\n\n3.1 Hand hygiene must be performed at the WHO 5 moments.\n\n3.2 PPE must be worn in all patient contact areas.\n\n3.3 Sharps disposal must follow the colour-coded bin protocol.\n\n3.4 Monthly infection surveillance reports must be submitted to the Quality Officer.', byDept:{Nursing:'18/52',OPD:'12/18',Laboratory:'2/14',Emergency:'2/28'} },
-  { id:'POL-002', title:'Patient Privacy Policy',           category:'Governance', version:'v3.0', updated:'2026-03-03', attested:178, total:180, reviewDue:'Mar 2027', status:'Published',        cohsasa:'GOV-003', owner:'Quality Officer Banda', cycle:'Annual',  content:'1. Purpose\n\nTo protect the privacy and confidentiality of all patient information in accordance with Malawi data protection laws and COHSASA governance standards.\n\n2. Scope\n\nAll staff who access patient records, including clinical, administrative, and support staff.\n\n3. Key Requirements\n\n3.1 Patient information must not be shared without written consent.\n\n3.2 Electronic records must be accessed only by authorised personnel.\n\n3.3 Any breach of patient privacy must be reported immediately to the Quality Officer.', byDept:{Nursing:'52/52',OPD:'18/18',Administration:'80/82',Laboratory:'14/14'} },
-  { id:'POL-003', title:'Medication Administration Policy', category:'Clinical',   version:'v2.1', updated:'2026-03-10', attested:18,  total:42,  reviewDue:'Mar 2027', status:'Published',        cohsasa:'MED-002', owner:'Pharmacy Lead',        cycle:'Annual',  content:'1. Purpose\n\nTo ensure safe and accurate medication administration to all patients.\n\n2. Scope\n\nAll nursing and pharmacy staff involved in prescribing, dispensing, or administering medications.\n\n3. The Five Rights\n\n3.1 Right patient — verify using two identifiers.\n\n3.2 Right drug — check against prescription.\n\n3.3 Right dose — calculate and verify.\n\n3.4 Right route — confirm administration method.\n\n3.5 Right time — administer as scheduled.', byDept:{Nursing:'14/30',Pharmacy:'4/12'} },
-  { id:'POL-004', title:'Fire Safety & Evacuation Policy',  category:'Safety',     version:'v5.0', updated:'2026-01-15', attested:180, total:180, reviewDue:'Jan 2027', status:'Published',        cohsasa:'SAF-001', owner:'Safety Officer',       cycle:'Annual',  content:'1. Purpose\n\nTo ensure all staff are prepared to respond to fire emergencies and safely evacuate patients and visitors.\n\n2. Evacuation Routes\n\nEvacuation maps are posted at all exits. Primary and secondary routes are clearly marked.\n\n3. Staff Responsibilities\n\n3.1 All staff must know the location of fire extinguishers.\n\n3.2 Fire drills are conducted quarterly.\n\n3.3 No fire doors to be propped open at any time.', byDept:{Nursing:'52/52',OPD:'18/18',Administration:'82/82',Laboratory:'14/14',Emergency:'14/14'} },
-  { id:'POL-005', title:'Waste Management Policy',          category:'Safety',     version:'v2.3', updated:'2024-12-01', attested:0,   total:180, reviewDue:'Jan 2026', status:'Expired',          cohsasa:'SAF-003', owner:'Safety Officer',       cycle:'Annual',  content:'This policy has expired and is due for renewal. Contact the Quality Officer to initiate the review process.', byDept:{} },
-  { id:'POL-006', title:'Hand Hygiene Policy',              category:'Clinical',   version:'v3.1', updated:'2026-02-20', attested:155, total:180, reviewDue:'Feb 2027', status:'Published',        cohsasa:'IPC-002', owner:'Quality Officer Banda', cycle:'Annual',  content:'1. Purpose\n\nTo prevent healthcare-associated infections through rigorous hand hygiene practice in line with WHO guidelines.\n\n2. The Five Moments\n\n2.1 Before patient contact\n\n2.2 Before aseptic procedure\n\n2.3 After body fluid exposure risk\n\n2.4 After patient contact\n\n2.5 After contact with patient surroundings', byDept:{Nursing:'52/52',OPD:'16/18',Emergency:'14/14',Laboratory:'14/14'} },
-];
-
-var DEFAULT_SOPS = [
-  { id:'SOP-001', title:'IV Line Insertion Procedure',     dept:'Inpatient · Nursing',      icon:'💉', version:'v3.1', updated:'2026-03-03', status:'Current',    category:'Inpatient'  },
-  { id:'SOP-002', title:'Medication Dispensing Protocol',  dept:'Pharmacy',                 icon:'💊', version:'v4.0', updated:'2026-02-15', status:'Current',    category:'Pharmacy'   },
-  { id:'SOP-003', title:'Specimen Collection & Labelling', dept:'Laboratory',               icon:'🔬', version:'v2.2', updated:'2026-03-01', status:'Review Due', category:'Laboratory' },
-  { id:'SOP-004', title:'Cardiac Arrest Response',         dept:'Emergency · All clinical', icon:'🚨', version:'v5.2', updated:'2026-02-24', status:'Current',    category:'Emergency'  },
-  { id:'SOP-005', title:'Hand Hygiene Protocol',           dept:'All Departments',          icon:'🧴', version:'v2.0', updated:'2026-02-15', status:'Current',    category:'All'        },
-  { id:'SOP-006', title:'Dental Sterilisation Procedure',  dept:'Dental',                   icon:'🦷', version:'v1.3', updated:'2026-02-02', status:'Current',    category:'Dental'     },
-  { id:'SOP-007', title:'Surgical Safety Checklist',       dept:'Theatre',                  icon:'🏥', version:'v3.0', updated:'2026-01-20', status:'Current',    category:'Theatre'    },
-  { id:'SOP-008', title:'Patient Identification Protocol', dept:'All Departments',          icon:'🪪', version:'v2.1', updated:'2026-03-10', status:'Current',    category:'All'        },
-];
-
-var DEFAULT_ACTIONS = [
-  { id:'CA-012', action:'Review medication vial labelling protocol with pharmacy', source:'INC-0041', assigned:'Pharmacy Lead',         due:'2026-03-19', progress:60,  status:'In Progress' },
-  { id:'CA-011', action:'Install additional handrails — Ward 2 corridor',          source:'INC-0040', assigned:'Maintenance Officer',   due:'2026-03-15', progress:20,  status:'Overdue'     },
-  { id:'CA-010', action:'Alarm volume audit — all infusion pumps in hospital',     source:'INC-0039', assigned:'Biomedical Officer',    due:'2026-03-22', progress:45,  status:'In Progress' },
-  { id:'CA-009', action:'Update specimen labelling SOP with double-check step',    source:'INC-0038', assigned:'Lab Manager',           due:'2026-03-10', progress:10,  status:'Overdue'     },
-  { id:'CA-008', action:'Bathroom non-slip mat installation — Ward 1 bathrooms',   source:'INC-0037', assigned:'Maintenance Officer',   due:'2026-03-12', progress:0,   status:'Overdue'     },
-  { id:'CA-007', action:'Defibrillator battery replacement schedule update',       source:'INC-0035', assigned:'Biomedical Officer',    due:'2026-03-08', progress:100, status:'Closed'      },
-  { id:'CA-006', action:'Surgical checklist compliance training for theatre staff',source:'INC-0034', assigned:'Theatre Lead',          due:'2026-03-05', progress:100, status:'Closed'      },
-  { id:'CA-005', action:'Fall risk assessment tool added to admission form',       source:'INC-0037', assigned:'Quality Officer Banda', due:'2026-03-20', progress:80,  status:'In Progress' },
-];
-
-var DEFAULT_PENDING = ['POL-001', 'POL-003', 'SOP-003'];
-
-// ---- init ----
-function initData() {
-  if (!localStorage.getItem(TICKETS_KEY))  localStorage.setItem(TICKETS_KEY,  JSON.stringify(DEFAULT_INCIDENTS));
-  if (!localStorage.getItem(POLICIES_KEY)) localStorage.setItem(POLICIES_KEY, JSON.stringify(DEFAULT_POLICIES));
-  if (!localStorage.getItem(SOPS_KEY))     localStorage.setItem(SOPS_KEY,     JSON.stringify(DEFAULT_SOPS));
-  if (!localStorage.getItem(ACTIONS_KEY))  localStorage.setItem(ACTIONS_KEY,  JSON.stringify(DEFAULT_ACTIONS));
-  if (!localStorage.getItem(ATTEST_KEY))   localStorage.setItem(ATTEST_KEY,   JSON.stringify(DEFAULT_PENDING));
-}
-
-function getIncidents() { return JSON.parse(localStorage.getItem(TICKETS_KEY)  || '[]'); }
-function saveIncidents(d){ localStorage.setItem(TICKETS_KEY,  JSON.stringify(d)); }
-function getPolicies()  { return JSON.parse(localStorage.getItem(POLICIES_KEY) || '[]'); }
-function savePolicies(d){ localStorage.setItem(POLICIES_KEY, JSON.stringify(d)); }
-function getSOPs()      { return JSON.parse(localStorage.getItem(SOPS_KEY)     || '[]'); }
-function getActions()   { return JSON.parse(localStorage.getItem(ACTIONS_KEY)  || '[]'); }
-function saveActions(d) { localStorage.setItem(ACTIONS_KEY,  JSON.stringify(d)); }
-function getPending()   { return JSON.parse(localStorage.getItem(ATTEST_KEY)   || '[]'); }
-function savePending(d) { localStorage.setItem(ATTEST_KEY,   JSON.stringify(d)); }
-function getUser()      { return JSON.parse(localStorage.getItem(USER_KEY)     || 'null'); }
-function logout()       { localStorage.removeItem(USER_KEY); window.location.href = 'index.html'; }
+// ---- TOKEN MANAGEMENT ----
+function getToken()          { return sessionStorage.getItem('bah_token'); }
+function setToken(t)         { sessionStorage.setItem('bah_token', t); }
+function getUser()           { var u = sessionStorage.getItem('bah_user'); return u ? JSON.parse(u) : null; }
+function setUser(u)          { sessionStorage.setItem('bah_user', JSON.stringify(u)); }
+function logout()            { sessionStorage.clear(); window.location.href = 'index.html'; }
 
 function requireLogin() {
   var u = getUser();
-  if (!u) { window.location.href = 'index.html'; return null; }
+  if (!u || !getToken()) { window.location.href = 'index.html'; return null; }
   return u;
 }
 
-// ---- helpers ----
+// ---- IN-MEMORY CACHE ----
+var _cache = {
+  incidents:  [],
+  policies:   [],
+  sops:       [],
+  actions:    [],
+  pending:    [],
+  kpis:       [],
+  stats:      null,
+  loaded:     false
+};
+
+// ---- API FETCH HELPER ----
+function apiFetch(path, options) {
+  options = options || {};
+  var headers = { 'Content-Type': 'application/json' };
+  var token = getToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  options.headers = Object.assign(headers, options.headers || {});
+  return fetch(API_BASE + path, options).then(function(res) {
+    if (res.status === 401) { logout(); return Promise.reject('Unauthorized'); }
+    if (!res.ok) return res.json().then(function(e) { return Promise.reject(e.message || 'Error'); });
+    if (res.status === 204) return null;
+    return res.json();
+  });
+}
+
+// ---- AUTH ----
+function login(email, password) {
+  return apiFetch('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: email, password: password })
+  }).then(function(data) {
+    setToken(data.token);
+    setUser({
+      name:     data.fullName,
+      email:    data.email,
+      role:     mapRole(data.role),
+      dept:     data.department,
+      title:    data.role,
+      initials: getInitials(data.fullName)
+    });
+    return data;
+  });
+}
+
+function mapRole(apiRole) {
+  var map = {
+    'SuperAdmin':     'admin',
+    'QualityManager': 'quality',
+    'ITStaff':        'staff',
+    'Maintenance':    'staff',
+    'Procurement':    'staff',
+    'Staff':          'staff'
+  };
+  return map[apiRole] || 'staff';
+}
+
+function getInitials(name) {
+  var parts = (name || '').split(' ');
+  return ((parts[0]||'')[0] + (parts[1]||'')[0]).toUpperCase();
+}
+
+// ---- LOAD ALL DATA ----
+function loadAllData() {
+  if (!getToken()) return Promise.resolve();
+  return Promise.all([
+    apiFetch('/api/incidents'),
+    apiFetch('/api/policies'),
+    apiFetch('/api/corrective-actions'),
+    apiFetch('/api/kb'),
+    apiFetch('/api/stats/compliance')
+  ]).then(function(results) {
+    _cache.incidents = results[0] || [];
+    _cache.policies  = results[1] || [];
+    _cache.actions   = results[2] || [];
+    _cache.sops      = results[3] || [];
+    _cache.stats     = results[4] || {};
+    _cache.kpis      = (_cache.stats && _cache.stats.kpis) ? _cache.stats.kpis : [];
+
+    // pending attestations — policies not yet attested by current user
+    _cache.pending = _cache.policies
+      .filter(function(p) { return p.status === 'Active' && (!p.attestations || p.attestations.length === 0); })
+      .map(function(p) { return p.policyNumber || p.id; });
+
+    _cache.loaded = true;
+  }).catch(function(err) {
+    console.error('Failed to load data:', err);
+  });
+}
+
+// ---- SYNCHRONOUS GETTERS (from cache) ----
+function getIncidents()  { return _cache.incidents; }
+function getPolicies()   { return _cache.policies; }
+function getSOPs()       { return _cache.sops; }
+function getActions()    { return _cache.actions; }
+function getPending()    { return _cache.pending; }
+function getKPIs()       { return _cache.kpis; }
+
+function getIncident(id) {
+  return _cache.incidents.find(function(i) { return i.id === id || i.incidentNumber === id; }) || null;
+}
+
+function getPolicy(id) {
+  return _cache.policies.find(function(p) { return p.id === id || p.policyNumber === id; }) || null;
+}
+
+// ---- WRITE OPERATIONS (async) ----
+function reportIncident(data) {
+  return apiFetch('/api/incidents', {
+    method: 'POST',
+    body: JSON.stringify({
+      title:       data.title || data.desc,
+      description: data.what || data.description || '',
+      type:        data.type === 'Near Miss' ? 'NearMiss' : 'Incident',
+      severity:    mapSeverity(data.severity),
+      department:  data.dept,
+      eventDate:   data.reported || new Date().toISOString(),
+      isAnonymous: data.anonymous || data.reporter === 'Anonymous'
+    })
+  }).then(function(result) {
+    return loadAllData().then(function() { return result; });
+  });
+}
+
+function mapSeverity(s) {
+  var map = {
+    'Near Miss':    'NearMiss',
+    'No Harm':      'NoHarm',
+    'Adverse Event':'Minor',
+    'Sentinel Event':'SentinelEvent',
+    'Major':        'Major',
+    'Minor':        'Minor'
+  };
+  return map[s] || 'NoHarm';
+}
+
+function updateIncidentStatus(id, status, note) {
+  var inc = getIncident(id);
+  if (!inc) return Promise.reject('Incident not found');
+  return apiFetch('/api/incidents/' + inc.id + '/status', {
+    method: 'PATCH',
+    body: JSON.stringify({ status: status, note: note })
+  }).then(function() {
+    return loadAllData();
+  });
+}
+
+function addIncidentNote(id, text) {
+  var inc = getIncident(id);
+  if (!inc) return Promise.reject('Incident not found');
+  return apiFetch('/api/incidents/' + inc.id + '/notes', {
+    method: 'POST',
+    body: JSON.stringify({ text: text })
+  }).then(function() {
+    return loadAllData();
+  });
+}
+
+function toggleAttestation(policyId) {
+  var pol = getPolicy(policyId);
+  if (!pol) return Promise.reject('Policy not found');
+  return apiFetch('/api/policies/' + pol.id + '/attest', {
+    method: 'POST'
+  }).then(function() {
+    return loadAllData();
+  });
+}
+
+// ---- STATS (from cache) ----
+function getStats() {
+  var p = getPolicies();
+  var i = getIncidents();
+  var k = getKPIs();
+  var a = getActions();
+
+  return {
+    totalPolicies:   p.length,
+    activePolicies:  p.filter(function(x){ return x.status === 'Active'; }).length,
+    draftPolicies:   p.filter(function(x){ return x.status === 'Draft'; }).length,
+    reviewPolicies:  p.filter(function(x){ return x.status === 'UnderReview'; }).length,
+    avgAttestation:  50, // computed server-side in full impl
+    totalIncidents:  i.length,
+    openIncidents:   i.filter(function(x){ return x.status === 'Open'; }).length,
+    nearMisses:      i.filter(function(x){ return x.type === 'NearMiss'; }).length,
+    sentinelEvents:  i.filter(function(x){ return x.severity === 'SentinelEvent'; }).length,
+    openActions:     a.filter(function(x){ return x.status === 'Open'; }).length,
+    closedActions:   a.filter(function(x){ return x.status === 'Closed'; }).length,
+    kpisMet:         k.filter(function(x){ return x.status === 'OnTarget'; }).length,
+    kpisTotal:       k.length,
+    cohsasaScore:    _cache.stats ? 78 : 0,
+  };
+}
+
+// ---- HELPERS (unchanged from original) ----
 function statusBadge(s) {
-  var map   = { 'Published':'win-badge-green', 'Pending Approval':'win-badge-yellow', 'Under Review':'win-badge-blue', 'Expired':'win-badge-red', 'Investigating':'win-badge-yellow', 'Action Plan':'win-badge-orange', 'Closed':'win-badge-gray', 'In Progress':'win-badge-blue', 'Overdue':'win-badge-red', 'Open':'win-badge-blue', 'Current':'win-badge-green', 'Review Due':'win-badge-red', 'Archived':'win-badge-gray' };
+  var map = {
+    'Published':'win-badge-green', 'Active':'win-badge-green',
+    'Pending Approval':'win-badge-yellow', 'UnderReview':'win-badge-yellow', 'Under Review':'win-badge-yellow',
+    'Expired':'win-badge-red',
+    'Investigating':'win-badge-yellow', 'Action Plan':'win-badge-orange',
+    'Closed':'win-badge-gray',
+    'In Progress':'win-badge-blue', 'InProgress':'win-badge-blue',
+    'Overdue':'win-badge-red',
+    'Open':'win-badge-blue',
+    'Current':'win-badge-green', 'Review Due':'win-badge-red',
+    'Archived':'win-badge-gray', 'Draft':'win-badge-gray',
+    'OnTarget':'win-badge-green', 'AtRisk':'win-badge-yellow', 'OffTarget':'win-badge-red'
+  };
   return '<span class="win-badge ' + (map[s] || 'win-badge-gray') + '">' + s + '</span>';
 }
 
 function severityDot(s) {
-  var map = { 'Near Miss':'#f59e0b', 'No Harm':'#6b7280', 'Adverse Event':'#ef4444', 'Sentinel Event':'#7c3aed' };
+  var map = { 'NearMiss':'#f59e0b', 'Near Miss':'#f59e0b', 'NoHarm':'#6b7280', 'No Harm':'#6b7280', 'Minor':'#ef4444', 'Major':'#ef4444', 'Adverse Event':'#ef4444', 'SentinelEvent':'#7c3aed', 'Sentinel Event':'#7c3aed' };
   return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (map[s]||'#6b7280') + ';margin-right:5px;vertical-align:middle"></span>';
 }
 
@@ -128,7 +265,7 @@ function showToast(msg, type) {
   setTimeout(function() { t.classList.add('hide'); setTimeout(function(){ t.remove(); }, 300); }, 3000);
 }
 
-// ---- WINDOWS 11 CSS ----
+// ---- WINDOWS 11 CSS (unchanged) ----
 var WIN_CSS = '\
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");\
 :root{\
@@ -238,3 +375,21 @@ textarea.form-control{resize:vertical;min-height:80px;line-height:1.6;}\
 .empty-icon{font-size:36px;margin-bottom:10px;}\
 .tag{display:inline-block;background:var(--win-surface3);border:1px solid var(--win-border);border-radius:3px;padding:1px 6px;font-size:11px;color:var(--text-muted);margin:2px;}\
 ';
+
+// ---- PAGE INIT HELPER ----
+// Call this at the top of every page script instead of initData()
+// Usage: initPage('dashboard').then(function(user) { renderPage(user); });
+function initPage(pageName) {
+  var user = requireLogin();
+  if (!user) return Promise.reject('Not logged in');
+  return loadAllData().then(function() {
+    return user;
+  });
+}
+
+// ---- DEMO USERS (for index.html login hints) ----
+var DEMO_USERS = {
+  'admin@bah.mw':   { hint: 'Admin@2026' },
+  'quality@bah.mw': { hint: 'Quality@2026' },
+  'staff@bah.mw':   { hint: 'Staff@2026' }
+};
