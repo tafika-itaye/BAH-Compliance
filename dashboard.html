@@ -16,6 +16,7 @@
 .att-item:last-child{border-bottom:none;}
 .att-title{font-size:13px;font-weight:600;margin-bottom:2px;}
 .att-sub{font-size:11px;color:var(--text-muted);}
+.loading{text-align:center;padding:40px;color:var(--text-muted);font-size:13px;}
 </style>
 </head>
 <body>
@@ -35,8 +36,8 @@
       </div>
     </div>
     <div class="content">
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Compliance Overview — <strong style="color:var(--text)">BAH Quality &amp; Safety Platform</strong> — March 2026</div>
-      <div class="stats-grid" id="statCards"></div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Compliance Overview — <strong style="color:var(--text)">BAH Quality &amp; Safety Platform</strong></div>
+      <div class="stats-grid" id="statCards"><div class="loading">Loading...</div></div>
       <div class="three-col" style="margin-bottom:14px;">
         <div>
           <div class="card" style="margin-bottom:14px">
@@ -44,7 +45,7 @@
               <div class="card-title" style="margin:0">Pending Staff Attestations</div>
               <a href="attestations.html" style="font-size:12px">View all →</a>
             </div>
-            <div id="attestList"></div>
+            <div id="attestList"><div class="loading">Loading...</div></div>
           </div>
           <div class="card">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -61,16 +62,14 @@
             <div class="card-title" style="margin:0">Recent Incidents &amp; Near Misses</div>
             <a href="report-incident.html" style="font-size:12px">Report new →</a>
           </div>
-          <div id="recentInc"></div>
+          <div id="recentInc"><div class="loading">Loading...</div></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 <script>
-initData();
-var user = requireLogin();
-if (user) {
+initPage('dashboard').then(function(user) {
   document.getElementById('ws').textContent = WIN_CSS;
   renderSidebar('dashboard');
   document.getElementById('dateLabel').textContent = topbarDate();
@@ -80,31 +79,32 @@ if (user) {
   var actions   = getActions();
   var sops      = getSOPs();
 
-  var open     = incidents.filter(function(i){ return i.status==='Investigating'||i.status==='Action Plan'; }).length;
-  var sopOk    = sops.filter(function(s){ return s.status==='Current'; }).length;
-  var overdue  = actions.filter(function(a){ return a.status==='Overdue'; }).length;
-  var activeAc = actions.filter(function(a){ return a.status!=='Closed'; }).length;
+  var open     = incidents.filter(function(i){ return i.status === 'Open' || i.status === 'Investigating'; }).length;
+  var sopOk    = sops.filter(function(s){ return s.status === 'Current'; }).length;
+  var overdue  = actions.filter(function(a){ return a.status === 'Overdue'; }).length;
+  var activeAc = actions.filter(function(a){ return a.status !== 'Closed'; }).length;
 
   document.getElementById('statCards').innerHTML = [
-    { icon:'📋', label:'Policy Compliance', value:'94%',                       sub:'Staff attestation rate',  cls:'stat-warn' },
-    { icon:'⚠',  label:'Open Incidents',    value:open,                        sub:'Under investigation',     cls:open>0?'stat-bad':'' },
-    { icon:'🔒', label:'SOPs Current',      value:sopOk+'/'+sops.length,       sub:'3 due for review',        cls:'stat-warn' },
-    { icon:'✔',  label:'Corrective Actions',value:activeAc,                    sub:overdue+' overdue',        cls:overdue>0?'stat-bad':'stat-ok' },
+    { icon:'📋', label:'Policy Compliance',  value:'94%',                 sub:'Staff attestation rate',  cls:'stat-warn' },
+    { icon:'⚠',  label:'Open Incidents',     value:open,                  sub:'Under investigation',     cls:open > 0 ? 'stat-bad' : '' },
+    { icon:'🔒', label:'SOPs Current',       value:sopOk+'/'+sops.length, sub:'Check review dates',      cls:'stat-warn' },
+    { icon:'✔',  label:'Corrective Actions', value:activeAc,              sub:overdue+' overdue',        cls:overdue > 0 ? 'stat-bad' : 'stat-ok' },
   ].map(function(s){
     return '<div class="stat-card"><div style="font-size:20px;margin-bottom:4px">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-value '+s.cls+'">'+s.value+'</div><div class="stat-sub">'+s.sub+'</div></div>';
   }).join('');
 
-  var attItems = [
-    { title:'Infection Control Policy — v4.2',     sub:'Updated 3 days ago · Mandatory for all clinical staff · 34 of 112 acknowledged', due:'Due: 20 Mar', urgent:true,  done:false },
-    { title:'Medication Administration SOP — v2.1', sub:'Updated 5 days ago · Nursing staff · 18 of 42 acknowledged',                    due:'Due: 24 Mar', urgent:false, done:false },
-    { title:'Patient Privacy Policy — v3.0',        sub:'Updated 2 weeks ago · All staff · 178 of 180 acknowledged',                     due:'Complete',    urgent:false, done:true  },
-  ];
-  document.getElementById('attestList').innerHTML = attItems.map(function(a){
-    if (a.done) {
-      return '<div class="att-item"><div><div class="att-title">✔ '+a.title+'</div><div class="att-sub">'+a.sub+'</div></div><span style="font-size:12px;color:var(--success);font-weight:600">Complete</span></div>';
-    }
-    return '<div class="att-item"><div><div class="att-title">⏳ '+a.title+'</div><div class="att-sub">'+a.sub+'</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:12px;font-weight:600;color:'+(a.urgent?'var(--danger)':'var(--warning)')+'">'+a.due+'</div><a href="attestations.html" style="font-size:11px">Acknowledge →</a></div></div>';
-  }).join('');
+  // Attestation list from live policies
+  var activePolicies = policies.filter(function(p){ return p.status === 'Active'; }).slice(0, 3);
+  if (activePolicies.length === 0) {
+    document.getElementById('attestList').innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:10px 0">No active policies requiring attestation.</div>';
+  } else {
+    document.getElementById('attestList').innerHTML = activePolicies.map(function(p){
+      var pct = p.attestCount && p.attestTarget ? Math.round(p.attestCount / p.attestTarget * 100) : 0;
+      var done = pct >= 100;
+      if (done) return '<div class="att-item"><div><div class="att-title">✔ '+p.title+'</div><div class="att-sub">v'+p.version+' · '+p.department+' · Complete</div></div><span style="font-size:12px;color:var(--success);font-weight:600">Complete</span></div>';
+      return '<div class="att-item"><div><div class="att-title">⏳ '+p.title+'</div><div class="att-sub">v'+p.version+' · '+p.department+' · '+(p.attestCount||0)+' of '+(p.attestTarget||'?')+' acknowledged</div></div><div style="text-align:right;flex-shrink:0"><a href="attestations.html" style="font-size:11px">Acknowledge →</a></div></div>';
+    }).join('');
+  }
 
   var bars = [
     { label:'Policy Attestation', pct:94,  color:'#0067c0' },
@@ -116,12 +116,19 @@ if (user) {
   }).join('');
 
   var incHtml = '<table class="win-table" style="font-size:12px"><thead><tr><th>Ref</th><th>Description</th><th>Type</th><th>Severity</th><th>Dept</th><th>Reported</th><th>Status</th></tr></thead><tbody>';
-  incidents.slice(0, 4).forEach(function(i){
-    incHtml += '<tr><td><a href="incident-detail.html?id='+i.id+'">'+i.id+'</a></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+i.desc+'</td><td>'+i.type+'</td><td>'+severityDot(i.severity)+i.severity+'</td><td>'+i.dept+'</td><td>'+timeAgo(i.reported)+'</td><td>'+statusBadge(i.status)+'</td></tr>';
-  });
+  if (incidents.length === 0) {
+    incHtml += '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px">No incidents recorded.</td></tr>';
+  } else {
+    incidents.slice(0, 4).forEach(function(i){
+      incHtml += '<tr onclick="location.href=\'incident-detail.html?id='+i.id+'\'" style="cursor:pointer"><td style="color:var(--accent);font-weight:600">'+i.incidentNumber+'</td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+i.title+'</td><td>'+i.type+'</td><td>'+severityDot(i.severity)+i.severity+'</td><td>'+i.department+'</td><td>'+timeAgo(i.createdAt)+'</td><td>'+statusBadge(i.status)+'</td></tr>';
+    });
+  }
   incHtml += '</tbody></table>';
   document.getElementById('recentInc').innerHTML = incHtml;
-}
+
+}).catch(function() {
+  window.location.href = 'index.html';
+});
 </script>
 </body>
 </html>
