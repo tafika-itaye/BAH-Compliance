@@ -10,6 +10,7 @@
 .inc-tab{padding:8px 14px;font-size:13px;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap;}
 .inc-tab:hover{color:var(--text);}
 .inc-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.loading{text-align:center;padding:40px;color:var(--text-muted);font-size:13px;}
 </style>
 </head>
 <body>
@@ -29,89 +30,109 @@
     </div>
     <div class="content">
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Complete incident register with investigation status tracking</div>
-      <div class="stats-grid" id="incStats"></div>
+      <div class="stats-grid" id="incStats"><div class="loading">Loading...</div></div>
       <div style="display:flex;gap:0;border-bottom:1px solid var(--win-border);margin-bottom:14px">
         <div class="inc-tab active" onclick="filterTab('',this)">All (<span id="cAll">0</span>)</div>
-        <div class="inc-tab" onclick="filterTab('No Harm',this)">No Harm (<span id="cNH">0</span>)</div>
-        <div class="inc-tab" onclick="filterTab('Near Miss',this)">Near Miss (<span id="cNM">0</span>)</div>
-        <div class="inc-tab" onclick="filterTab('Adverse Event',this)">Adverse (<span id="cAE">0</span>)</div>
+        <div class="inc-tab" onclick="filterTab('NoHarm',this)">No Harm (<span id="cNH">0</span>)</div>
+        <div class="inc-tab" onclick="filterTab('NearMiss',this)">Near Miss (<span id="cNM">0</span>)</div>
+        <div class="inc-tab" onclick="filterTab('Minor',this)">Adverse (<span id="cAE">0</span>)</div>
+        <div class="inc-tab" onclick="filterTab('SentinelEvent',this)">Sentinel (<span id="cSE">0</span>)</div>
       </div>
       <div class="filter-row">
         <div class="win-search"><span style="color:var(--text-muted)">🔍</span><input type="text" id="search" placeholder="Search incidents…" oninput="render()"></div>
-        <select class="filter-select" id="stFilter" onchange="render()"><option value="">All Status</option><option>Investigating</option><option>Action Plan</option><option>Closed</option></select>
-        <select class="filter-select" id="deptFilter" onchange="render()"><option value="">All Depts</option><option>OPD</option><option>Ward 2</option><option>Ward 3</option><option>Laboratory</option><option>Emergency</option><option>Pharmacy</option><option>Theatre</option></select>
+        <select class="filter-select" id="stFilter" onchange="render()">
+          <option value="">All Status</option>
+          <option value="Open">Open</option>
+          <option value="Investigating">Investigating</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <select class="filter-select" id="deptFilter" onchange="render()">
+          <option value="">All Depts</option>
+          <option>OPD</option><option>Ward 1</option><option>Ward 2</option><option>Ward 3</option>
+          <option>ICU</option><option>Laboratory</option><option>Emergency</option>
+          <option>Pharmacy</option><option>Theatre</option><option>CSSD</option>
+        </select>
       </div>
       <div class="win-table-wrap">
         <table class="win-table">
-          <thead><tr><th>Ref</th><th>Description</th><th>Type</th><th>Severity</th><th>Dept</th><th>Reported</th><th>Status</th><th></th></tr></thead>
-          <tbody id="incBody"></tbody>
+          <thead><tr><th>Ref</th><th>Title</th><th>Type</th><th>Severity</th><th>Dept</th><th>Reported</th><th>Status</th><th></th></tr></thead>
+          <tbody id="incBody"><tr><td colspan="8"><div class="loading">Loading...</div></td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
 <script>
-initData();
-var user = requireLogin();
 var tabSev = '';
-if (user) {
+
+initPage('incidents').then(function(user) {
   renderSidebar('incidents');
   document.getElementById('dateLabel').textContent = topbarDate();
+  render();
+}).catch(function() {
+  window.location.href = 'index.html';
+});
 
-  function render() {
-    var q   = document.getElementById('search').value.toLowerCase();
-    var sf  = document.getElementById('stFilter').value;
-    var df  = document.getElementById('deptFilter').value;
-    var inc = getIncidents();
+function render() {
+  var q   = document.getElementById('search').value.toLowerCase();
+  var sf  = document.getElementById('stFilter').value;
+  var df  = document.getElementById('deptFilter').value;
+  var inc = getIncidents();
 
-    document.getElementById('cAll').textContent = inc.length;
-    document.getElementById('cNH').textContent  = inc.filter(function(i){ return i.severity==='No Harm'; }).length;
-    document.getElementById('cNM').textContent  = inc.filter(function(i){ return i.severity==='Near Miss'; }).length;
-    document.getElementById('cAE').textContent  = inc.filter(function(i){ return i.severity==='Adverse Event'; }).length;
+  document.getElementById('cAll').textContent = inc.length;
+  document.getElementById('cNH').textContent  = inc.filter(function(i){ return i.severity === 'NoHarm'; }).length;
+  document.getElementById('cNM').textContent  = inc.filter(function(i){ return i.severity === 'NearMiss'; }).length;
+  document.getElementById('cAE').textContent  = inc.filter(function(i){ return i.severity === 'Minor' || i.severity === 'Major'; }).length;
+  document.getElementById('cSE').textContent  = inc.filter(function(i){ return i.severity === 'SentinelEvent'; }).length;
 
-    var open    = inc.filter(function(i){ return i.status==='Investigating'||i.status==='Action Plan'; }).length;
-    var closed  = inc.filter(function(i){ return i.status==='Closed'; }).length;
-    var nmRate  = Math.round(inc.filter(function(i){ return i.severity==='Near Miss'; }).length/Math.max(inc.length,1)*100);
+  var open   = inc.filter(function(i){ return i.status === 'Open' || i.status === 'Investigating'; }).length;
+  var closed = inc.filter(function(i){ return i.status === 'Closed'; }).length;
+  var nmCnt  = inc.filter(function(i){ return i.type === 'NearMiss'; }).length;
+  var nmRate = Math.round(nmCnt / Math.max(inc.length, 1) * 100);
 
-    document.getElementById('incStats').innerHTML = [
-      { icon:'⚠',  label:'Total This Month',      value:inc.length, sub:'▲ +22% reporting rate', cls:'' },
-      { icon:'🔍', label:'Under Investigation',    value:open,       sub:'Awaiting completion',   cls:open>0?'stat-warn':'' },
-      { icon:'✔',  label:'Closed',                value:closed,     sub:'Actions complete',       cls:'stat-ok' },
-      { icon:'📊', label:'Near Miss Rate',         value:nmRate+'%', sub:'Target: ≥ 30%',          cls:nmRate>=30?'stat-ok':'stat-warn' },
-    ].map(function(s){ return '<div class="stat-card"><div style="font-size:18px;margin-bottom:4px">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-value '+s.cls+'">'+s.value+'</div><div class="stat-sub">'+s.sub+'</div></div>'; }).join('');
+  document.getElementById('incStats').innerHTML = [
+    { icon:'⚠',  label:'Total Incidents',       value:inc.length, sub:'All recorded events',    cls:'' },
+    { icon:'🔍', label:'Under Investigation',    value:open,       sub:'Awaiting completion',   cls:open > 0 ? 'stat-warn' : '' },
+    { icon:'✔',  label:'Closed',                value:closed,     sub:'Actions complete',       cls:'stat-ok' },
+    { icon:'📊', label:'Near Miss Rate',         value:nmRate+'%', sub:'Target: ≥ 30%',          cls:nmRate >= 30 ? 'stat-ok' : 'stat-warn' },
+  ].map(function(s){
+    return '<div class="stat-card"><div style="font-size:18px;margin-bottom:4px">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-value '+s.cls+'">'+s.value+'</div><div class="stat-sub">'+s.sub+'</div></div>';
+  }).join('');
 
-    if (tabSev) inc = inc.filter(function(i){ return i.severity===tabSev; });
-    if (sf)     inc = inc.filter(function(i){ return i.status===sf; });
-    if (df)     inc = inc.filter(function(i){ return i.dept===df; });
-    if (q)      inc = inc.filter(function(i){ return i.desc.toLowerCase().indexOf(q)!==-1||i.id.toLowerCase().indexOf(q)!==-1; });
+  if (tabSev) inc = inc.filter(function(i){ return i.severity === tabSev; });
+  if (sf)     inc = inc.filter(function(i){ return i.status === sf; });
+  if (df)     inc = inc.filter(function(i){ return i.department === df; });
+  if (q)      inc = inc.filter(function(i){ return (i.title||'').toLowerCase().indexOf(q) !== -1 || (i.incidentNumber||'').toLowerCase().indexOf(q) !== -1; });
 
-    if (!inc.length) { document.getElementById('incBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📋</div>No incidents match your filters.</div></td></tr>'; return; }
-
-    var html = '';
-    inc.forEach(function(i) {
-      html += '<tr>'
-        + '<td><a href="incident-detail.html?id='+i.id+'" style="font-weight:700">'+i.id+'</a></td>'
-        + '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+i.desc+'</td>'
-        + '<td style="font-size:12px">'+i.type+'</td>'
-        + '<td>'+severityDot(i.severity)+'<span style="font-size:12px">'+i.severity+'</span></td>'
-        + '<td style="font-size:12px">'+i.dept+'</td>'
-        + '<td style="font-size:12px;color:var(--text-muted)">'+timeAgo(i.reported)+'</td>'
-        + '<td>'+statusBadge(i.status)+'</td>'
-        + '<td><a href="incident-detail.html?id='+i.id+'" class="btn btn-secondary btn-sm">View</a></td>'
-        + '</tr>';
-    });
-    document.getElementById('incBody').innerHTML = html;
+  if (!inc.length) {
+    document.getElementById('incBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📋</div>No incidents match your filters.</div></td></tr>';
+    return;
   }
 
-  function filterTab(sev, el) {
-    tabSev = sev;
-    document.querySelectorAll('.inc-tab').forEach(function(t){ t.classList.remove('active'); });
-    el.classList.add('active');
-    render();
-  }
-  window.filterTab = filterTab;
+  var html = '';
+  inc.forEach(function(i) {
+    html += '<tr onclick="location.href=\'incident-detail.html?id='+i.id+'\'" style="cursor:pointer">'
+      + '<td style="font-weight:700;color:var(--accent)">'+i.incidentNumber+'</td>'
+      + '<td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+i.title+'</td>'
+      + '<td style="font-size:12px">'+i.type+'</td>'
+      + '<td>'+severityDot(i.severity)+'<span style="font-size:12px">'+i.severity+'</span></td>'
+      + '<td style="font-size:12px">'+(i.department||'—')+'</td>'
+      + '<td style="font-size:12px;color:var(--text-muted)">'+timeAgo(i.createdAt)+'</td>'
+      + '<td>'+statusBadge(i.status)+'</td>'
+      + '<td><a href="incident-detail.html?id='+i.id+'" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">View</a></td>'
+      + '</tr>';
+  });
+  document.getElementById('incBody').innerHTML = html;
+}
+
+function filterTab(sev, el) {
+  tabSev = sev;
+  document.querySelectorAll('.inc-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
   render();
 }
+window.filterTab = filterTab;
+window.render = render;
 </script>
 </body>
 </html>
